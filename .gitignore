@@ -1,0 +1,91 @@
+###############################
+# Maven 관련 파일 (빌드/릴리즈 시 자동 생성)
+###############################
+target/                         # Maven 빌드 결과물
+pom.xml.tag                     # Maven release plugin 임시파일
+pom.xml.releaseBackup           # release 수행 시 생성되는 백업 파일
+pom.xml.versionsBackup          # 버전 변경 시 백업 파일
+pom.xml.next                    # release 진행 중 생성되는 파일
+release.properties              # release plugin 설정
+dependency-reduced-pom.xml      # shade plugin 사용 시 생성
+buildNumber.properties          # build 번호 저장 파일
+.mvn/timing.properties          # Maven 실행 시간 기록
+.mvn/wrapper/maven-wrapper.jar  # Maven Wrapper JAR (Git에 올릴 필요 없음)
+
+###############################
+# Java 빌드 산출물
+###############################
+*.class                         # 컴파일된 클래스 파일
+*.jar                           # 패키징된 JAR
+*.war                           # 웹 애플리케이션 WAR
+*.ear                           # Enterprise Application
+*.zip                           # 압축 파일 (일반적으로 제외)
+*.tar.gz
+*.rar
+
+###############################
+# Eclipse IDE 설정 파일
+###############################
+.classpath                      # Eclipse 프로젝트 설정
+.project                        # Eclipse 프로젝트 정보
+.settings/                      # Eclipse 환경설정
+.metadata/                      # 워크스페이스 메타데이터
+
+###############################
+# IntelliJ IDEA 설정 파일
+###############################
+.idea/                          # IntelliJ 프로젝트 설정
+*.iml                           # 모듈 설정 파일
+*.iws                           # 워크스페이스 설정
+*.ipr                           # 프로젝트 설정
+out/                            # IntelliJ 빌드 디렉토리
+
+###############################
+# NetBeans IDE 설정 파일
+###############################
+nbproject/                      # NetBeans 프로젝트 파일
+nbbuild/                        # NetBeans 빌드 폴더
+dist/                           # NetBeans 배포 폴더
+nbdist/                         # NetBeans 배포 폴더
+.nb-gradle/                     # NetBeans Gradle 관련 폴더
+
+###############################
+# VS Code 설정
+###############################
+.vscode/                        # VSCode 설정
+
+###############################
+# OS 자동 생성 파일
+###############################
+.DS_Store                       # macOS 폴더 메타데이터
+Thumbs.db                       # Windows 이미지 캐시
+
+###############################
+# 로그 파일
+###############################
+logs/                           # 로그 디렉토리
+*.log                           # 단일 로그 파일
+*.log.*                         # 회전 로그 파일
+
+###############################
+# DB 설정 파일 (민감 정보)
+###############################
+db.properties                   # DB 접속 정보(보안상 Git 제외)
+
+###############################
+# 임시 파일
+###############################
+*.tmp                           # 임시파일
+*.bak                           # 백업파일
+*.swp                           # Vim swap 파일
+*~                              # 기타 임시파일
+
+###############################
+# 웹 애플리케이션(서버가 생성하는 클래스)
+###############################
+src/main/webapp/WEB-INF/classes/   # Tomcat이 런타임에 생성하는 클래스 경로
+
+###############################
+# Tomcat 관련 파일
+###############################
+tomcat/                          # 톰캣 실행 또는 배포 폴더
