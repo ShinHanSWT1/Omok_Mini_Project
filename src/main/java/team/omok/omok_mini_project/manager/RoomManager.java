@@ -8,17 +8,22 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 서버 전체에 존재하는 모든 room을 관리하며, 싱글톤으로 구현된다.
+ * room의 내부상태 접근하지 않고, 방 생성, 조회, 삭제 등 room 자체에 대하여만 조작한다.
+ *
+ * @function RoomManager.getInstance()
+ * @function public Room getRoom(String roomId)
+ * @function public List<Room> getWaitingRooms()
+ * @function public Room createRoom(String userId)
+ * @function public boolean removeRoom(int roomId)
+ */
 public class RoomManager {
-    private static final RoomManager instance = new RoomManager();
-    private final Map<String, Room> rooms = new ConcurrentHashMap<>();
-
+    private static final RoomManager instance = new RoomManager();          // 싱글톤 인스턴스
+    private final Map<String, Room> rooms = new ConcurrentHashMap<>();      // 서버에 존재하는 방 리스트(roomId, Room)
 
     public static RoomManager getInstance() {
         return instance;
-    }
-
-    public Room getRoom(String roomId) {
-        return rooms.get(roomId);
     }
 
     public Room createRoom(String userId) {
@@ -29,17 +34,38 @@ public class RoomManager {
         return room;
     }
 
+    public void enterRoom(String roomId, UserVO user) {
+        Room room = rooms.get(roomId);
+        if (room == null) {
+            throw new IllegalArgumentException("방이 존재하지 않습니다");
+        }
+        room.tryAddPlayer(user.getId());
+    }
+
+    public boolean removeRoom(String roomId){
+        return rooms.remove(roomId) != null;
+    }
+
+    public Room getRoom(String roomId) {
+        return rooms.get(roomId);
+    }
+
+    public List<Room> getAllRooms() {
+        return rooms.values().stream().toList();
+    }
+
     public List<Room> getWaitingRooms() {
         return rooms.values().stream()
                 .filter(room -> !room.isFull())
                 .toList();
     }
 
-    public void enterRoom(String roomId, UserVO user) {
+    public void tryStartGame(String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) {
-            throw new IllegalArgumentException("방 없음");
+            throw new IllegalArgumentException("방이 존재하지 않습니다");
         }
-        room.addPlayer(user.getId());
+        room.tryStartGame();
     }
+
 }
