@@ -19,7 +19,7 @@ public class RoomServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String roomId = request.getParameter("roomId");
-        Room room = roomManager.getRoom(roomId);
+        Room room = roomManager.getRoomById(roomId);
 
         if (room == null) {
             response.sendRedirect("/omok/lobby");
