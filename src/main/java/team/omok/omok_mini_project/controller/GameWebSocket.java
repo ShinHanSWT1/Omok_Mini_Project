@@ -1,12 +1,13 @@
 package team.omok.omok_mini_project.controller;
 
-import team.omok.omok_mini_project.domain.Room;
-import team.omok.omok_mini_project.manager.RoomManager;
+import java.io.IOException;
 
 import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.PathParam;
-import java.io.IOException;
+import javax.websocket.server.ServerEndpoint;
+
+import team.omok.omok_mini_project.domain.Room;
+import team.omok.omok_mini_project.manager.RoomManager;
 
 @ServerEndpoint("/ws/game/{roomId}")
 public class GameWebSocket {

@@ -1,10 +1,11 @@
 package team.omok.omok_mini_project.domain;
 
-import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.websocket.Session;
 
 public class Room {
     private final String roomId;

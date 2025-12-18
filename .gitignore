@@ -76,3 +76,4 @@ db.properties
 ###############################
 src/main/webapp/WEB-INF/classes/
 tomcat/
+/bin/
