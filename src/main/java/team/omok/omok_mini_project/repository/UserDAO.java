@@ -20,8 +20,8 @@ public class UserDAO {
 
             if (rs.next()) {
                 UserVO vo = new UserVO();
-                vo.setId(rs.getString("login_id"));
-                vo.setPassword(rs.getString("user_pwd"));
+                vo.setLoginId(rs.getString("login_id"));
+                vo.setUserPwd(rs.getString("user_pwd"));
                 vo.setNickname(rs.getString("nickname"));
                 System.out.println(vo);
                 return vo;

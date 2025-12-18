@@ -23,9 +23,9 @@ public class RoomManager {
         return rooms.get(roomId);
     }
 
-    public Room createRoom(String userId) {
+    public Room createRoom(String login_id) {
         String roomId = UUID.randomUUID().toString();
-        Room room = new Room(roomId, userId);
+        Room room = new Room(roomId, String.valueOf(login_id));
         rooms.put(roomId, room);
 
         return room;
@@ -59,6 +59,6 @@ public class RoomManager {
         if (room == null) {
             throw new IllegalArgumentException("방 없음");
         }
-        room.addPlayer(user.getId());
+        room.addPlayer(String.valueOf(user.getUserId()));
     }
 }
