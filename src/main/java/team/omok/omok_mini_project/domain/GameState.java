@@ -29,8 +29,18 @@ public class GameState {
 			Arrays.fill(board[y], Stone.EMPTY);
 		}
 		this.turn = Stone.BLACK;
-        this.status = GameStatus.IN_PROGRESS;
+        this.status = GameStatus.READY;
 	}
+	
+	public static Stone opposite(Stone s) {
+        if (s == Stone.BLACK) return Stone.WHITE;
+        if (s == Stone.WHITE) return Stone.BLACK;
+        return Stone.EMPTY;
+    }
+	
+	public static boolean isPlayerStone(Stone s) {
+        return s == Stone.BLACK || s == Stone.WHITE;
+    }
 	
 	public boolean inBounds(int x, int y) {
         return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
@@ -53,18 +63,22 @@ public class GameState {
     }
 
     public void setTurn(Stone turn) {
-        if (turn == null || !turn.isPlayerStone()) {
+        if (turn == null || !isPlayerStone(turn)) {
             throw new IllegalArgumentException("turn must be BLACK or WHITE");
         }
         this.turn = turn;
     }
 
     public void switchTurn() {
-        this.turn = this.turn.opposite();
+        this.turn = opposite(this.turn);
     }
 
     public GameStatus getStatus() {
         return status;
+    }
+    
+    public void startGame() {
+        this.status = GameStatus.IN_PROGRESS;
     }
 
     public void endGame() {
