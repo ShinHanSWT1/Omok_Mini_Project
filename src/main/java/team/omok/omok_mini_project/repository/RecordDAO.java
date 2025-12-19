@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LobbyDAO {
+public class RecordDAO {
     public static List<RankingDTO> getTopRank() {
         List<RankingDTO> list = new ArrayList<RankingDTO>();
 
