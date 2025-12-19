@@ -9,52 +9,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/lobby/*")
+@WebServlet("/lobby")
 public class LobbyServlet extends HttpServlet {
-//    private final RoomService roomService = new RoomService();
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        System.out.println("[INFO]lobby-doGet");
 
-        String path = request.getPathInfo(); // null, /enter
-        if ("/enter".equals(path)) {
-            System.out.println("[INFO]lobby-doGet-enter");
+        HttpSession session = req.getSession(false);
+        UserVO loginUser = (session == null) ? null : (UserVO) session.getAttribute("loginUser");
 
-            UserVO user = (UserVO) request.getSession().getAttribute("loginUser");
-            String roomId = request.getParameter("roomId");
-
-//            roomService.enterRoom(roomId, user);
-
-            response.sendRedirect("/omok/room?roomId=" + roomId);
+        if (loginUser == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-//        // 기본: 로비 화면
-//        System.out.println("[INFO]lobby-doGet");
-////        List<Room> rooms = roomService.getWaitingRooms();
-//        request.setAttribute("rooms", rooms);
-//        request.getRequestDispatcher("/WEB-INF/views/lobby.jsp")
-//                .forward(request, response);
+        req.setAttribute("loginUser", loginUser);
+        req.getRequestDispatcher("/WEB-INF/views/lobby.jsp").forward(req, resp);
     }
-
-//    @Override
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//
-//        String path = request.getPathInfo(); // /create
-//        UserVO user = (UserVO) request.getSession().getAttribute("loginUser");
-//
-//        if ("/create".equals(path)) {
-//            System.out.println("[INFO]lobby-doPost-create");
-//            Room room = roomService.createRoom(user.getId());
-//            response.sendRedirect("/omok/room?roomId=" + room.getRoomId());
-//        }
-//
-//    }
 }

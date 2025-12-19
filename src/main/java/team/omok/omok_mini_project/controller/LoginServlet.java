@@ -41,8 +41,8 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("loginUser", user);
 
-//            // 컨텍스트 포함 redirect
-//            response.sendRedirect(request.getContextPath() + "/lobby");
+            // 컨텍스트 포함 redirect
+            response.sendRedirect(request.getContextPath() + "/lobby");
 
         } catch (IllegalArgumentException e) {
             // 로그인 실패(아이디/비번 틀림 등)
@@ -51,9 +51,13 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
 
         } catch (Exception e) {
-            // DB 오류 등 예상 못한 에러
-            request.setAttribute("error", "서버 오류가 발생했습니다.");
+            e.printStackTrace();
+
+            String msg = e.getClass().getSimpleName() + ": " + e.getMessage();
+            request.setAttribute("error", msg);
+
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
+
     }
 }

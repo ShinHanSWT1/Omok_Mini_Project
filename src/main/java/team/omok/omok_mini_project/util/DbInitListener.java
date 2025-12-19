@@ -19,7 +19,7 @@ public class DbInitListener implements ServletContextListener { //이것만 추�
             Context ctx = new InitialContext();
 
             // 2) context.xml에 등록한 Resource name으로 DataSource 가져오기
-            // context.xml: <Resource name="jdbc/omokdb" ... />
+
             DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/omokdb");
 
             // 3) 전역 저장소(ServletContext)에 저장 -> 모든 Servlet에서 꺼내씀
@@ -41,7 +41,6 @@ public class DbInitListener implements ServletContextListener { //이것만 추�
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // DataSource는 Tomcat이 관리(풀)하므로 보통 여기서 할 일 없음
         System.out.println("[JNDI] contextDestroyed");
     }
 }

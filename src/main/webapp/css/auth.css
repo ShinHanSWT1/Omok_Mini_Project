@@ -1,0 +1,258 @@
+/* 로그인/회원가입 화면: loginBG.png(프레임) 위에 input/button을 절대 배치 */
+
+:root {
+    /* ✅ Neon은 선명하게, 부드러움은 blur/확산으로만 */
+    --neon-core: rgba(35, 255, 255, 0.95);   /* 선명한 중심 */
+    --neon-mid: rgba(35, 255, 255, 0.55);    /* 중간 확산 */
+    --neon-far: rgba(35, 255, 255, 0.22);    /* 바깥 확산 */
+    --neon-outline: rgba(0, 220, 240, 0.95); /* 테두리 */
+
+    --text-typed: rgba(8, 50, 55, 0.94);
+    --text-placeholder: rgba(120, 150, 180, 0.85); /* cool gray-blue (no light) */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    /* loginBG.png가 UI 프레임(배경) 역할이므로, 다른 배경 이미지는 사용하지 않음 */
+    background-color: #000;
+    font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+}
+
+.ui-stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.ui-frame {
+    position: relative;
+    width: min(1100px, 96vw);
+    aspect-ratio: 1366 / 768; /* loginBG.png 비율(대략 16:9) */
+    max-height: 92vh;
+
+    /* ✅ loginBG.png를 배경으로 사용(고정 비율 유지) */
+    background: url("/assets/loginBG.png") no-repeat center center;
+    background-size: contain;
+}
+
+/* .ui-frame-img 는 더 이상 사용하지 않음(배경 이미지 방식으로 전환) */
+
+/* 공통 input 스타일 (프레임 안에서만 사용) */
+.ui-input {
+    position: absolute;
+    box-sizing: border-box;
+
+    height: 6%;
+    padding: 0 2.2%;
+
+    border-radius: 999px;
+    border: 0.35vw solid var(--neon-outline);
+    /* ❗input 자체 opacity는 사용하지 않음(배경만 rgba로 투명감) */
+    background: rgba(255, 255, 255, 0.72);
+
+    font-size: clamp(12px, 1.4vw, 16px);
+    font-weight: 600;
+    color: var(--text-typed);
+
+    outline: none;
+
+    /* focus-in/out: 물 속처럼 부드럽게 채워지는 느낌 */
+    transition:
+            box-shadow 260ms ease-in-out,
+            border-color 260ms ease-in-out,
+            transform 260ms ease-in-out,
+            background-color 260ms ease-in-out;
+    transform: scale(1);
+}
+
+.ui-input::placeholder {
+    /* "NO LIGHT" placeholder: glow 없음, 뒤로 물러난 톤 */
+    color: var(--text-placeholder);
+    opacity: 1;
+    text-shadow: none;
+}
+
+.ui-input:focus {
+    /* ✅ 다중 레이어 글로우: 중심은 선명, 바깥은 확산 */
+    box-shadow:
+            /* inner neon (sharp) */
+            0 0 0 0.18vw var(--neon-core) inset,
+            0 0 0.55vw 0.08vw var(--neon-core) inset,
+            /* mid diffusion */
+            0 0 1.2vw 0.20vw var(--neon-mid),
+            /* far diffusion */
+            0 0 2.2vw 0.55vw var(--neon-far);
+    border-color: var(--neon-core);
+    transform: scale(1.015);
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.ui-input:focus::placeholder {
+    /* 포커스 시에도 placeholder는 glow 없이 유지 */
+    color: var(--text-placeholder);
+    text-shadow: none;
+}
+
+/* 버튼(이미지) 공통 */
+.ui-btn {
+    position: absolute;
+    display: block;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+
+    /* 버튼 주변 글로우는 pseudo-element로 (이미지 픽셀 변경 X) */
+    transform: scale(1);
+    transform-origin: center center;
+    transition: transform 220ms cubic-bezier(0.22, 1.0, 0.36, 1.0);
+    will-change: transform;
+    /* glow가 버튼(이미지) "뒤"에서만 보이도록 stacking context 생성 */
+    isolation: isolate;
+}
+
+.ui-btn img {
+    width: 100%;
+    height: auto; /* 비율 유지 */
+    display: block;
+    user-select: none;
+    /* 이미지 자체는 색/필터 변경하지 않음 */
+    transition: transform 220ms cubic-bezier(0.22, 1.0, 0.36, 1.0);
+}
+
+.ui-btn::before {
+    content: "";
+    position: absolute;
+    inset: -14%;
+    border-radius: 999px;
+    pointer-events: none;
+    /* ✅ glow는 버튼 뒤로 */
+    z-index: -1;
+    opacity: 0;
+    /* Neon stays vivid, softness via blur/diffusion */
+    background: radial-gradient(circle at 50% 50%,
+    rgba(35, 255, 255, 0.70) 0%,
+    rgba(35, 255, 255, 0.35) 30%,
+    rgba(35, 255, 255, 0.0) 70%);
+    filter: blur(12px);
+    transition:
+            opacity 220ms ease-in-out,
+            filter 220ms ease-in-out,
+            transform 220ms ease-in-out;
+    transform: scale(0.98);
+}
+
+.ui-btn:hover {
+    /* 아주 미세하게만 확대 */
+    transform: scale(1.01);
+}
+
+.ui-btn:hover::before {
+    opacity: 0.75; /* ✅ 덜 화려하게 */
+    filter: blur(14px);
+    transform: scale(1.015);
+}
+
+.ui-btn:active {
+    /* 클릭: 살짝 눌림 + glow는 타이트해졌다가 복귀 */
+    transform: scale(0.995);
+    transition-duration: 110ms;
+}
+
+.ui-btn:active::before {
+    opacity: 0.60; /* ✅ 덜 화려하게 */
+    filter: blur(10px);
+    transform: scale(0.995);
+    transition-duration: 110ms;
+}
+
+/* 키보드 접근성: 포커스 링도 동일한 네온 언어로 */
+.ui-btn:focus-visible::before {
+    opacity: 0.75;
+    filter: blur(12px);
+}
+
+.ui-form {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+}
+
+/* 에러/안내 텍스트(프레임 안) */
+.ui-text {
+    position: absolute;
+    font-size: clamp(11px, 1.2vw, 14px);
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+}
+
+.ui-text.error {
+    color: #b3261e;
+}
+
+.ui-text.ok {
+    color: #0b6b3a;
+}
+
+.ui-text.warn {
+    color: #083b3b;
+}
+
+/* ---- 포지션(%) : login/register 공통으로 유지 ---- */
+
+/* LEFT: ID/PW (LOGIN 영역) */
+.pos-id {
+    left: 16.5%;
+    top: 61.5%;
+    width: 27.0%;
+}
+
+.pos-pw {
+    left: 16.5%;
+    top: 70.0%;
+    width: 27.0%;
+}
+
+/* register 페이지에서만 쓰는 닉네임(동일 영역 안에 추가) */
+.pos-nick {
+    left: 16.5%;
+    top: 78.5%;
+    width: 27.0%;
+}
+
+/* LEFT: submit 버튼(로그인/회원가입) */
+.pos-left-action {
+    left: 18.0%;
+    top: 81.5%;
+    width: 25.5%;
+}
+
+/* RIGHT: 반대편 이동 버튼(회원가입/로그인) */
+.pos-right-action {
+    left: 57.0%;
+    top: 64.0%;
+    width: 33.0%;
+}
+
+/* 텍스트 위치 */
+.pos-left-msg {
+    left: 17.0%;
+    top: 58.0%;
+}
+
+.pos-left-check {
+    left: 17.0%;
+    top: 59.7%;
+}
+
+
+

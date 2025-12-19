@@ -38,6 +38,15 @@ public class RegisterServlet extends HttpServlet {
         String password = req.getParameter("password");
         String nickname = req.getParameter("nickname");
         String profileImg = req.getParameter("profileImg"); //이미지 일단 문자열로 함 추후 수정예정
+        //기본값
+        if (profileImg == null || profileImg.isBlank()) {
+            profileImg = "/assets/profiles/p1.png";
+        }
+        // 허용된 경로만 저장
+        if (!profileImg.startsWith("/assets/profiles/")) {
+            profileImg = "/assets/profiles/p1.png";
+        }
+
 
         UserVO user = new UserVO();
         user.setLoginId(loginId);

@@ -1,46 +1,56 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!doctype html>
-<html>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>오목 로그인</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .box { max-width: 400px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
-        .row { margin-bottom: 12px; }
-        input { width: 100%; height: 38px; padding: 0 10px; }
-        button { height: 40px; padding: 0 16px; font-weight: bold; }
-        .error { color: red; margin-bottom: 10px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omok Login</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
 </head>
 <body>
 
-<h2>로그인</h2>
+<%
+    String error = (String) request.getAttribute("error");
+    String loginIdVal = (String) request.getAttribute("loginId");
+    if (loginIdVal == null) loginIdVal = "";
+%>
 
-<div class="box">
+<div class="screen">
 
-    <!-- 에러 메시지 -->
-    <c:if test="${not empty error}">
-        <div class="error">${error}</div>
-    </c:if>
+    <!-- 에러 메시지(원하면 위치/스타일 바꿔도 됨) -->
+    <% if (error != null) { %>
+    <div class="error"><%= error %></div>
+    <% } %>
 
-    <form method="post" action="${pageContext.request.contextPath}/login">
-        <div class="row">
-            <input type="text" name="loginId" placeholder="아이디">
-        </div>
+    <!-- 로그인 폼: 시작하기 버튼 누르면 LoginServlet(/login)로 POST -->
+    <form class="login-form" method="post" action="${pageContext.request.contextPath}/login">
 
-        <div class="row">
-            <input type="password" name="password" placeholder="비밀번호">
-        </div>
+        <!-- 아이디 -->
+        <input class="input id"
+               type="text"
+               name="loginId"
+               value="<%= loginIdVal %>"
+               placeholder="아이디"
+               autocomplete="username" />
 
-        <button type="submit">로그인</button>
+        <!-- 비밀번호 -->
+        <input class="input pw"
+               type="password"
+               name="password"
+               placeholder="비밀번호"
+               autocomplete="current-password" />
+
+        <!-- 시작하기 버튼(이미지 버튼) -->
+        <button class="start-btn" type="submit" aria-label="로그인">
+            <img src="${pageContext.request.contextPath}/assets/loginButton.png" alt="로그인">
+        </button>
+
     </form>
 
-    <br>
 
-    <!-- 회원가입 이동 -->
-    <a href="${pageContext.request.contextPath}/register">회원가입</a>
+    <a class="join-btn" href="${pageContext.request.contextPath}/register" aria-label="회원가입">
+        <img src="${pageContext.request.contextPath}/assets/registerButton.png" alt="회원가입">
+    </a>
 
 </div>
 

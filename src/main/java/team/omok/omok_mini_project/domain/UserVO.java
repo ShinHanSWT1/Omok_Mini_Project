@@ -2,9 +2,6 @@ package team.omok.omok_mini_project.domain;
 
 import lombok.Data;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 
 @Data
