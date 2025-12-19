@@ -48,7 +48,11 @@ public class GameWebSocket {
             room.tryStartGame();
         }
 
-        session.getBasicRemote().sendText("CONNECTED");
+        // 기존 코드 (JSON 파싱 에러 발생)
+        // session.getBasicRemote().sendText("CONNECTED");
+
+        // 수정: JSON 형식으로 연결 메시지 전송
+        session.getBasicRemote().sendText("{\"type\":\"CONNECTED\",\"message\":\"게임방 연결 성공\"}");
     }
 
     @OnMessage
