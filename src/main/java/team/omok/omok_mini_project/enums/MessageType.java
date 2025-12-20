@@ -8,7 +8,8 @@ public enum MessageType {
     ROOM_END,
     COUNTDOWN,
     GAME_START,
-    MOVE,
+    MOVE,       // 클라이언트 -> 서버
+    MOVE_OK,    // 서버 -> 클라이언트
     GAME_END,
     CHAT,
     ERROR

@@ -67,20 +67,10 @@ public class GameWebSocket {
 
                     room.handleMove(userId, payload.getX(), payload.getY());
                 }
+
                 case CHAT -> {
                     String msg = (String) wsMessage.getPayload();
-
-                    boolean isPlayer = room.getPlayers().contains(userId);
-                    int playerIndex = isPlayer ? room.getPlayers().indexOf(userId) + 1 : -1;
-
-                    room.broadcast(new WsMessage<>(
-                            MessageType.CHAT,
-                            Map.of(
-                                    "senderRole", isPlayer ? "PLAYER" : "SPECTATOR",
-                                    "playerIndex", playerIndex,
-                                    "message", msg
-                            )
-                    ));
+                    room.handleChat(userId, msg);
                 }
 
                 default -> {

@@ -1,0 +1,158 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* 배경화면 */
+body {
+    background: url("../img/register_bg.png") center/cover no-repeat fixed;
+}
+
+
+.screen {
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* 카드 */
+.box {
+    width: min(560px, 92vw);
+    padding: 26px 26px 22px;
+
+    border-radius: 18px;
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(0,0,0,0.08);
+    backdrop-filter: blur(6px);
+}
+
+
+.title {
+    margin: 0 0 14px;
+    font-size: 28px;
+    font-weight: 900;
+}
+
+/* 에러났을시 */
+.error {
+    color: #d60000;
+    font-weight: 900;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.85);
+    padding: 8px 10px;
+    border-radius: 10px;
+}
+
+
+.row {
+    margin-bottom: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 900;
+}
+
+input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    font-size: 16px;
+
+    border: 1px solid rgba(0,0,0,0.18);
+    border-radius: 12px;
+    box-sizing: border-box;
+
+    background: rgba(255,255,255,0.95);
+    outline: none;
+}
+
+input:focus {
+    box-shadow: 0 0 0 3px rgba(45,127,249,0.25);
+}
+
+/* 프로필 */
+.profiles {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 8px 0 6px;
+}
+
+.profile-item {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    object-fit: cover;
+    background: white;
+    transition: transform 0.08s ease;
+}
+
+.profile-item:hover {
+    transform: scale(1.03);
+}
+
+.profile-item.selected {
+    border-color: #2d7ff9;
+    box-shadow: 0 0 0 3px rgba(45,127,249,0.18);
+}
+
+/* 안내 */
+.hint {
+    color: #555;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+/* 버튼 */
+.actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.btn-primary {
+    height: 46px;
+    padding: 0 22px;
+    font-size: 16px;
+
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 900;
+
+    background: #2d7ff9;
+    color: white;
+}
+
+.btn-link {
+    color: #2d7ff9;
+    text-decoration: underline;
+    font-weight: 900;
+}
+
+
+@media (max-width: 480px) {
+    .box {
+        padding: 18px 18px 16px;
+    }
+    .title {
+        font-size: 24px;
+    }
+    .profile-item {
+        width: 64px;
+        height: 64px;
+    }
+}

@@ -42,4 +42,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-connectWebSocket();
+document.addEventListener("DOMContentLoaded", () => {
+    connectWebSocket();
+
+    document.getElementById("sendChat").onclick = () => {
+        const input = document.getElementById("chatInput");
+        if (!input.value.trim()) return;
+
+        sendMessage("CHAT", input.value);
+        input.value = "";
+    };
+
+    document.getElementById("leaveBtn").onclick = () => {
+        socket.close();
+        location.href = "/omok/lobby";
+    };
+
+    document.getElementById("chatInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            document.getElementById("sendChat").click();
+        }
+    });
+});

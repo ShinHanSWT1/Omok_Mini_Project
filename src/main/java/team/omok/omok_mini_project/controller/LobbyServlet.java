@@ -1,7 +1,9 @@
 package team.omok.omok_mini_project.controller;
 
+import team.omok.omok_mini_project.domain.RankingDTO;
 import team.omok.omok_mini_project.domain.Room;
 import team.omok.omok_mini_project.domain.vo.UserVO;
+import team.omok.omok_mini_project.repository.RecordDAO;
 import team.omok.omok_mini_project.service.RoomService;
 
 import javax.servlet.annotation.WebServlet;
@@ -54,19 +56,34 @@ public class LobbyServlet extends HttpServlet {
                 response.sendRedirect("/omok/lobby");
                 return;
             }
-            // 해당 방에 유저 입장
-            roomService.enterRoom(room.getRoomId(), user);
-            // 게임 방 화면으로 이동
-            response.sendRedirect("/omok/room?roomId=" + room.getRoomId());
+            try {
+                // 해당 방에 유저 입장
+                roomService.enterRoom(room.getRoomId(), user);
+                // 게임 방 화면으로 이동
+                response.sendRedirect("/omok/room?roomId=" + room.getRoomId());
+            } catch (IllegalStateException e) {
+                // 방이 가득 찬 경우 (동시성 이슈 등)
+                System.out.println("[WARN] 빠른 입장 실패 - 방이 가득 참: " + e.getMessage());
+                // 다시 로비로 이동 (혹은 다른 방 찾기 로직 추가 가능)
+                response.sendRedirect("/omok/lobby?error=full");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e; // 500 에러 원인 확인을 위해 다시 던지거나, 에러 페이지로 이동
+            }
             return;
         }
 
         // 기본: 로비 화면
         // 대기 중인 방 목록 가져옴
         List<Room> rooms = roomService.getWaitingRooms();
+        // 랭킹 정보 조회
+        List<RankingDTO> rankingList = RecordDAO.getTopRank();
         // JSP에서 쓸수 있도록 request에 저장
-        request.setAttribute("rooms", rooms);
+        request.setAttribute("rankingList", rankingList); // 랭킹정보
+        request.setAttribute("rooms", rooms); // room 정보
         // 실제 화면인 lobby.jsp로 포워딩
+        // 빈 리스트 전달 (JSP에서 에러 방지)
+//        request.setAttribute("rankings", new java.util.ArrayList<RankingDTO>());
         request.getRequestDispatcher("/WEB-INF/views/lobby.jsp")
                 .forward(request, response);
     }

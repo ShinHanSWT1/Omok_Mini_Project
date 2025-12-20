@@ -1,0 +1,53 @@
+/* =========================
+   Start Screen Style
+   ========================= */
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: url("../img/bg.png") no-repeat center center fixed;
+    background-size: cover;
+}
+
+.start-screen {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 시작 버튼 */
+.start-button {
+    position: absolute;
+    left: 50%;
+    top: 75%;
+    transform: translate(-50%, -50%) scale(1.5);
+
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+
+    transition: transform 200ms ease;
+}
+
+.start-button img {
+    display: block;
+    width: min(360px, 70vw);
+    height: auto;
+    user-select: none;
+
+    filter: drop-shadow(0 10px 22px rgba(255, 205, 110, 0.22))
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
+}
+
+.start-button:hover {
+    transform: translate(-50%, -50%) scale(1.55);
+}
+
+.start-button:active {
+    transform: translate(-50%, -50%) scale(1.52);
+}
