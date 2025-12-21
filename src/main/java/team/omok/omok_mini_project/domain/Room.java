@@ -201,7 +201,7 @@ public class Room {
         // 게임 초기화
         this.game = new Game(players.get(0), players.get(1));
         this.game.startGame();
-
+        System.out.println("게임시작");
         // 클라이언트에게 자신의 색 전달
 //        broadcastToPlayers(new WsMessage<>(
 //                MessageType.GAME_START,
@@ -214,7 +214,7 @@ public class Room {
             int userId = (int) s.getUserProperties().get("user_id");
             String myStone =
                     (userId == game.state.getBlackUserId()) ? "BLACK" : "WHITE";
-
+            System.out.println(userId + ": " + myStone);
             sendToSession(s, new WsMessage<>(
                     MessageType.GAME_START,
                     Map.of(

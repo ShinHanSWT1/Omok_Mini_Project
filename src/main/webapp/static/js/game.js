@@ -1,4 +1,4 @@
-const BOARD_SIZE = 15;
+const BOARD_SIZE = 14;
 let currentTurn = null;
 
 const boardState = Array.from(
@@ -9,6 +9,7 @@ const boardState = Array.from(
 function startGame(firstTurnColor) {
     currentTurn = firstTurnColor;
     renderBoard();
+    updateActivePlayer(currentTurn);
 }
 
 function placeStone(x, y) {
@@ -24,4 +25,5 @@ function applyMove(x, y, color) {
     drawStone(x, y, color);
 
     currentTurn = color === "BLACK" ? "WHITE" : "BLACK";
+    updateActivePlayer(currentTurn);
 }

@@ -1,6 +1,9 @@
 const statusEl = document.getElementById("status");
 const countdownEl = document.getElementById("countdown");
 const boardEl = document.getElementById("board");
+const playerLeftEl = document.querySelector(".player-left");
+const playerRightEl = document.querySelector(".player-right");
+
 console.log("ui.js loaded", boardEl);
 
 const messageHandlers = {
@@ -41,9 +44,6 @@ function handleCountdown(payload) {
 }
 
 function handleGameStart(payload) {
-    statusEl.innerText = "게임 시작!";
-    countdownEl.innerText = "";
-
     if (payload.myColor) {
         myColor = payload.myColor;
         console.log("내 색:", myColor);
@@ -88,19 +88,27 @@ function handleChat(payload) {
 
 
 function showCountdown(sec) {
-    statusEl.innerText = "게임 준비 중...";
-    countdownEl.innerText = `시작까지 ${sec}초`;
+    // statusEl.innerText = "게임 준비 중...";
+    // countdownEl.innerText = `시작까지 ${sec}초`;
 }
 
 function renderBoard() {
     boardEl.innerHTML = "";
     boardEl.className = "board";
     console.log("boardEl:", boardEl);
+
+    const grid = document.createElement("div");
+    grid.className = "grid-layer";
+    boardEl.appendChild(grid);
+    
     for (let y = 0; y < BOARD_SIZE; y++) {
         for (let x = 0; x < BOARD_SIZE; x++) {
             const cell = document.createElement("div");
             cell.className = "cell";
-            cell.onclick = () => placeStone(x, y);
+            cell.onclick = () => {
+                console.log("cell clicked:", x, y);
+                placeStone(x, y);
+            }
             boardEl.appendChild(cell);
         }
     }
@@ -109,23 +117,28 @@ function renderBoard() {
 function drawStone(x, y, color) {
     const idx = y * BOARD_SIZE + x;
     const cell = boardEl.children[idx];
-    cell.innerText = color === "BLACK" ? "●" : "○";
+
+    cell.classList.add(color === "BLACK" ? "black" : "white");
 }
 
 function showPlayerBubble(playerIndex, message) {
     const bubble = document.getElementById(
         playerIndex === 1 ? "bubble-p1" : "bubble-p2"
     );
-
     if (!bubble) return;
 
-    bubble.innerText = message;
-    bubble.style.display = "block";
+    const textEl = bubble.querySelector(".bubble-text");
+    if (textEl) textEl.textContent = message;
 
-    setTimeout(() => {
-        bubble.style.display = "none";
+    bubble.classList.add("show");
+
+    clearTimeout(bubble._hideTimer);
+    bubble._hideTimer = setTimeout(() => {
+        bubble.classList.remove("show");
     }, 3000);
 }
+
+
 
 function appendSpectatorChat(message) {
     const chatLog = document.getElementById("chatLog");
@@ -145,4 +158,15 @@ function handleError(payload) {
 
     // 지금은 간단히 알림
     alert(message);
+}
+
+function updateActivePlayer(turnColor) {
+    playerLeftEl.classList.remove("active");
+    playerRightEl.classList.remove("active");
+
+    if (turnColor === "BLACK") {
+        playerLeftEl.classList.add("active");
+    } else if (turnColor === "WHITE") {
+        playerRightEl.classList.add("active");
+    }
 }
