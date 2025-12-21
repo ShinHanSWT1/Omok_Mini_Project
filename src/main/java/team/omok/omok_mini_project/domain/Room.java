@@ -6,7 +6,8 @@ import team.omok.omok_mini_project.domain.vo.UserVO;
 import team.omok.omok_mini_project.enums.MessageType;
 import team.omok.omok_mini_project.enums.RoomStatus;
 import team.omok.omok_mini_project.manager.RoomManager;
-import team.omok.omok_mini_project.service.UserService;
+import team.omok.omok_mini_project.repository.RecordDAO;
+import team.omok.omok_mini_project.service.UserServices;
 import team.omok.omok_mini_project.util.JsonUtil;
 
 import javax.websocket.Session;
@@ -30,19 +31,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Data
 public class Room {
-    UserService userService = new UserService();
+    UserServices userService = new UserServices();
 
     private static final int MAX_PLAYER = 2;
 
     private final String roomId;
     private final int ownerId;
     private final long createdAt;                   // 방 생성 시간
+    private final RecordDAO recordDAO = new RecordDAO();
 
     private final List<Integer> players = new ArrayList<>(MAX_PLAYER);                // 플레이어(user_id 저장)
     private final Set<Session> playerSessions = ConcurrentHashMap.newKeySet();        // 플레이어 세션
     private final Set<Session> spectatorSessions = ConcurrentHashMap.newKeySet();     // 관전자 세션
 
     private RoomStatus status = RoomStatus.WAIT;     // 방 상태: WAITING, READY, COUNTDOWN, PLAYING, END
+
+
 
     // 게임
     private Game game;
@@ -230,6 +234,17 @@ public class Room {
     // 게임 종료 함수
     private synchronized void endGame(){
         // 게임 결과 저장 및 유저 전적 업데이트
+        // 게임 상태에서 승자 ID 가져오기
+        int winnerId = this.game.state.getWinnerId();
+
+        // 승자가 있을 경우 (무승부가 아님) DB 업데이트
+        if (winnerId != -1) {
+            for (Integer playerId : players) {
+                boolean isWin = (playerId == winnerId);
+                // DAO 호출: 이긴 사람은 true, 진 사람은 false 전달
+                recordDAO.updateRating(playerId, isWin);
+            }
+        }
 
         updateStatus(RoomStatus.END);
     }

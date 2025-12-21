@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Room
  *
  */
+
 public class RoomManager {
     private static final RoomManager instance = new RoomManager();          // 싱글톤 인스턴스
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();      // 서버에 존재하는 방 리스트(roomId, Room)
@@ -38,6 +39,9 @@ public class RoomManager {
         Room room = new Room(roomId, userId);
         rooms.put(roomId, room);
         System.out.println("[INFO]RoomManager - createRoom:" + roomId);
+
+        // 로비 웹소켓 test용
+        //LobbyManager.getInstance().broadcastRoomList();
 
         // TODO:
         // 현재는 단순화를 위해 RoomManager에서 직접 LobbyWebSocket을 호출한다.
@@ -54,6 +58,9 @@ public class RoomManager {
         }
         System.out.println("[INFO]RoomManager - enterRoom:" + roomId);
         room.tryAddPlayer(user.getUserId());
+
+        // 로비 웹소켓 test용
+        //LobbyManager.getInstance().broadcastRoomList();
 
         // TODO:
         // 현재는 단순화를 위해 RoomManager에서 직접 LobbyWebSocket을 호출한다.

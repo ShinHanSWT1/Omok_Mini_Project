@@ -1,5 +1,6 @@
 package team.omok.omok_mini_project.repository;
 
+import team.omok.omok_mini_project.domain.vo.RecordVO;
 import team.omok.omok_mini_project.domain.vo.UserVO;
 import team.omok.omok_mini_project.util.DBConnection;
 
@@ -16,10 +17,12 @@ public class UserDAO {
 
     public UserVO findByUserId(int userId) throws Exception {
         String sql = """
-            SELECT user_id, login_id, user_pwd, created_at, nickname, profile_img
-            FROM users
-            WHERE user_id=?
-        """;
+        SELECT u.user_id, u.login_id, u.user_pwd, u.created_at, u.nickname, u.profile_img,
+               r.rating, r.win_count, r.lose_count, r.updated_at
+        FROM users u
+        LEFT JOIN record r ON u.user_id = r.user_id
+        WHERE u.user_id = ?  
+    """;
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -29,6 +32,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
 
+                // 유저 정보 매핑
                 UserVO u = new UserVO();
                 u.setUserId(rs.getInt("user_id"));
                 u.setLoginId(rs.getString("login_id"));
@@ -36,6 +40,18 @@ public class UserDAO {
                 u.setCreatedAt(rs.getTimestamp("created_at"));
                 u.setNickname(rs.getString("nickname"));
                 u.setProfileImg(rs.getString("profile_img"));
+
+                // record 정보 매핑
+                RecordVO r = new RecordVO();
+                int rating = rs.getInt("rating");
+                r.setRating(rs.wasNull() ? 1000 : rating);
+                r.setWin_count(rs.getInt("win_count"));
+                r.setLose_count(rs.getInt("lose_count"));
+                r.setUpdated_at(rs.getTimestamp("updated_at"));
+                u.setRecord(r);
+
+                // UserVO에 RecordVO 추가
+                u.setRecord(r);
                 return u;
             }
         }
@@ -43,9 +59,11 @@ public class UserDAO {
 
     public UserVO findByLoginId(String loginId) throws Exception {
         String sql = """
-            SELECT user_id, login_id, user_pwd, created_at, nickname, profile_img
-            FROM users
-            WHERE login_id=?
+            SELECT u.user_id, u.login_id, u.user_pwd, u.created_at, u.nickname, u.profile_img,
+                   r.rating, r.win_count, r.lose_count, r.updated_at
+            FROM users u
+            LEFT JOIN record r ON u.user_id = r.user_id
+            WHERE u.login_id = ?
         """;
 
         try (Connection con = DBConnection.getConnection();
@@ -56,6 +74,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
 
+                // user 정보 매핑
                 UserVO u = new UserVO();
                 u.setUserId(rs.getInt("user_id"));
                 u.setLoginId(rs.getString("login_id"));
@@ -63,6 +82,17 @@ public class UserDAO {
                 u.setCreatedAt(rs.getTimestamp("created_at"));
                 u.setNickname(rs.getString("nickname"));
                 u.setProfileImg(rs.getString("profile_img"));
+
+                // record 정보 매핑
+                RecordVO r = new RecordVO();
+                int rating = rs.getInt("rating");
+                r.setRating(rs.wasNull() ? 1000 : rating);
+                r.setWin_count(rs.getInt("win_count"));
+                r.setLose_count(rs.getInt("lose_count"));
+                r.setUpdated_at(rs.getTimestamp("updated_at"));
+
+                // UserVO 객체에 RecordVO 주입
+                u.setRecord(r);
                 return u;
             }
         }

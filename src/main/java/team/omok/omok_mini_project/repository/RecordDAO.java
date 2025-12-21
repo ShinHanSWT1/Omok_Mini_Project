@@ -1,6 +1,6 @@
 package team.omok.omok_mini_project.repository;
 
-import team.omok.omok_mini_project.domain.RankingDTO;
+import team.omok.omok_mini_project.domain.dto.RankingDTO;
 import team.omok.omok_mini_project.util.DBConnection;
 
 import java.sql.Connection;
@@ -16,7 +16,7 @@ public class RecordDAO {
         String sql = "SELECT u.nickname, r.rating " +
                 "FROM record r JOIN users u " +
                 "ON r.user_id = u.user_id " +
-                "ORDER BY r.rating DESC LIMIT 5";
+                "ORDER BY r.rating DESC LIMIT 10";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
@@ -34,13 +34,13 @@ public class RecordDAO {
         return list;
     }
 
-    public void updataRating(int userId, boolean isWin) {
+    public void updateRating(int userId, boolean isWin) {
         String sql;
 
         if(isWin) {
-            sql = "UPDATE record SET rating = rating +15, win_count = win_count+1, updated_at = timestamp WHERE user_id = ?";
+            sql = "UPDATE record SET rating = rating +15, win_count = win_count+1, updated_at = NOW() WHERE user_id = ?";
         } else {
-            sql = "UPDATE record SET rating = GREATEST(0, rating - 10), lose_count = lose_count + 1, updated_at = timestamp WHERE user_id = ?";
+            sql = "UPDATE record SET rating = GREATEST(0, rating - 10), lose_count = lose_count + 1, updated_at = NOW() WHERE user_id = ?";
         }
 
         try(Connection conn = DBConnection.getConnection();

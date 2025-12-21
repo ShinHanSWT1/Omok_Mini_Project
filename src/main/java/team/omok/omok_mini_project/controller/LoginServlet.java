@@ -1,7 +1,7 @@
 package team.omok.omok_mini_project.controller;
 
 import team.omok.omok_mini_project.domain.vo.UserVO;
-import team.omok.omok_mini_project.service.UserService;
+import team.omok.omok_mini_project.service.UserServices;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -10,13 +10,13 @@ import java.io.IOException;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private UserService userService;
+    private UserServices userService;
 
     @Override
     public void init() {
 //        DataSource ds = (DataSource) getServletContext().getAttribute("dataSource");
 //        userService = new UserService(new UserDAO(ds));
-        this.userService = new UserService();
+        this.userService = new UserServices();
     }
 
     @Override

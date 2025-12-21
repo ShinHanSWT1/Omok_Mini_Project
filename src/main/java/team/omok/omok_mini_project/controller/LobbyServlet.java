@@ -1,6 +1,6 @@
 package team.omok.omok_mini_project.controller;
 
-import team.omok.omok_mini_project.domain.RankingDTO;
+import team.omok.omok_mini_project.domain.dto.RankingDTO;
 import team.omok.omok_mini_project.domain.Room;
 import team.omok.omok_mini_project.domain.vo.UserVO;
 import team.omok.omok_mini_project.repository.RecordDAO;
