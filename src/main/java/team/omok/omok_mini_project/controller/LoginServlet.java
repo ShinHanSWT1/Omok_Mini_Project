@@ -30,6 +30,24 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        String guestLogin = request.getParameter("guestLogin");
+        if ("true".equalsIgnoreCase(guestLogin)) {
+            UserVO guest = new UserVO();
+
+            int guestUserId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+
+            guest.setUserId(guestUserId);
+            guest.setLoginId("guest_" + guestUserId);
+            guest.setNickname("게스트#" + String.format("%04d", guestUserId % 10000));
+            guest.setProfileImg("/assets/profile/default.png"); // 너희 기본 경로로 맞추기
+            guest.setGuest(true);
+
+            HttpSession session = request.getSession();
+            session.setAttribute("loginUser", guest);
+
+            response.sendRedirect(request.getContextPath() + "/lobby");
+            return;
+        }
 
         // ★ login.jsp의 name과 일치해야 함
         String loginId = request.getParameter("loginId");
