@@ -15,44 +15,64 @@
     if (loginIdVal == null) loginIdVal = "";
 %>
 
+
 <div class="screen">
+    <div class="ui-anchor">
+        <form class="login-form"
+              method="post"
+              action="${pageContext.request.contextPath}/login">
 
-    <!-- 에러 메시지(원하면 위치/스타일 바꿔도 됨) -->
-    <% if (error != null) { %>
-    <div class="error"><%= error %></div>
-    <% } %>
+            <!-- 왼쪽 칼럼 : LOGIN -->
+            <div class="col left">
+                <!-- 에러 메시지 (화면 기준, 판넬 위) -->
 
-    <!-- 로그인 폼: 시작하기 버튼 누르면 LoginServlet(/login)로 POST -->
-    <form class="login-form" method="post" action="${pageContext.request.contextPath}/login">
+                <div class="error <%= (error != null ? "show" : "") %>">
+                    <%= (error != null ? error : "") %>
+                </div>
 
-        <!-- 아이디 -->
-        <input class="input id"
-               type="text"
-               name="loginId"
-               value="<%= loginIdVal %>"
-               placeholder="아이디"
-               autocomplete="username" />
+                <input class="input id"
+                       type="text"
+                       name="loginId"
+                       value="<%= loginIdVal %>"
+                       placeholder="아이디"
+                       autocomplete="username"/>
 
-        <!-- 비밀번호 -->
-        <input class="input pw"
-               type="password"
-               name="password"
-               placeholder="비밀번호"
-               autocomplete="current-password" />
+                <input class="input pw"
+                       type="password"
+                       name="password"
+                       placeholder="비밀번호"
+                       autocomplete="current-password"/>
 
-        <!-- 시작하기 버튼(이미지 버튼) -->
-        <button class="start-btn" type="submit" aria-label="로그인">
-            <img src="${pageContext.request.contextPath}/static/img/login_btn.png" alt="로그인">
-        </button>
+                <button class="login-btn" type="submit" aria-label="로그인">
+                    <img src="${pageContext.request.contextPath}/static/img/loginButton.png"
+                         alt="로그인"/>
+                </button>
 
-    </form>
+            </div>
 
+            <!-- 오른쪽 칼럼 : REGISTER -->
+            <div class="col right">
 
-    <a class="join-btn" href="${pageContext.request.contextPath}/register" aria-label="회원가입">
-        <img src="${pageContext.request.contextPath}/static/img/registerButton.png" alt="회원가입">
-    </a>
+                <!-- 비회원 로그인: /login으로 POST + guestLogin=true -->
+                <form method="post" action="${pageContext.request.contextPath}/login">
+                    <input type="hidden" name="guestLogin" value="true">
+                    <button type="submit" class="guestlogin-btn" aria-label="비회원로그인">
+                        <img src="${pageContext.request.contextPath}/static/img/guestButton.png"
+                             alt="비회원로그인"/>
+                    </button>
+                </form>
 
+                <!-- 회원가입 -->
+                <a class="register-btn"
+                   href="${pageContext.request.contextPath}/register"
+                   aria-label="회원가입">
+                    <img src="${pageContext.request.contextPath}/static/img/registerButton.png"
+                         alt="회원가입"/>
+                </a>
+
+            </div>
+        </form>
+    </div>
 </div>
-
 </body>
 </html>

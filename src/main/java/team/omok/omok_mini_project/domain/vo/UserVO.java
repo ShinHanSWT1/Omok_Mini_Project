@@ -12,6 +12,6 @@ public class UserVO {
     private Date createdAt;
     private String nickname;
     private String profileImg;
-
+    private boolean guest;
     private RecordVO record;
 }

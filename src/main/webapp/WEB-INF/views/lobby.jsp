@@ -648,7 +648,7 @@
             alert("입장할 방 번호나 코드를 입력해주세요!");
             return;
         }
-        location.href = '/omok/lobby/enter?roomId=' + code;
+        location.href = '/omok/lobby/enter?roomId=' + code + '&role=player';
     }
 
     function handleRoomCodeKeyPress(e) {

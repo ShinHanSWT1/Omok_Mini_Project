@@ -313,7 +313,7 @@ function appendSystemMessage(msg) {
     chatLog.scrollTop = chatLog.scrollHeight;
 }
 
-// 플레이어 나갔을 때 프사 내리는 함수
+// UI 리셋
 function resetPlayerUI(leftUserId) {
     // 나간 사람이 방장(왼쪽)이었는지 확인
     const isOwner = String(leftUserId) === String(OWNER_ID);
@@ -326,6 +326,8 @@ function resetPlayerUI(leftUserId) {
         const nameEl = targetEl.querySelector(".player-nickname");
         if (nameEl) nameEl.innerText = "Waiting...";
     }
+
+    renderBoard();
 }
 
 function startTurnTimer() {

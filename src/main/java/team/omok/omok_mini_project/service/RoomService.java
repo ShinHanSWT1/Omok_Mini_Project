@@ -10,7 +10,6 @@ import team.omok.omok_mini_project.enums.JoinResult;
 import team.omok.omok_mini_project.enums.LeaveResult;
 import team.omok.omok_mini_project.enums.MessageType;
 import team.omok.omok_mini_project.manager.RoomManager;
-import team.omok.omok_mini_project.repository.RecordDAO;
 
 import javax.websocket.Session;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ public class RoomService {
 
     private final RoomManager roomManager = RoomManager.getInstance();
     private final RoomBroadcaster broadcaster = new RoomBroadcaster();
-    private final RecordDAO recordDAO = new RecordDAO();
     private final UserService userService = new UserService();
 
     /// //////////////// 방 접근 함수 /////////////////////
@@ -294,32 +292,6 @@ public class RoomService {
 
         return room;
     }
-
-    private Map<String, Object> buildUserPayload(int userId, String role) {
-        UserVO userVO = null;
-        try {
-            userVO = userService.getUserById(userId);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        String nickname = (userVO == null)
-                ? "Guest_" + userId
-                : userVO.getNickname();
-
-        String profileImg = (userVO == null || userVO.getProfileImg() == null)
-                ? "/omok/static/img/profiles/p1.png"
-                : "/omok" + userVO.getProfileImg();
-
-        return Map.of(
-                "userId", userId,
-                "nickname", nickname,
-                "profileImg", profileImg,
-                "role", role
-        );
-    }
-
-    // RoomService.java 내부 하단에 추가
 
     private Map<String, Object> createUserInfoMap(int userId, boolean spectator) {
         String nickname;

@@ -2,6 +2,7 @@ package team.omok.omok_mini_project.domain;
 
 import lombok.Data;
 import team.omok.omok_mini_project.domain.dto.WsMessage;
+import team.omok.omok_mini_project.domain.vo.UserVO;
 import team.omok.omok_mini_project.enums.JoinResult;
 import team.omok.omok_mini_project.enums.LeaveResult;
 import team.omok.omok_mini_project.enums.MessageType;
@@ -12,10 +13,7 @@ import team.omok.omok_mini_project.service.RoomBroadcaster;
 import team.omok.omok_mini_project.service.UserService;
 
 import javax.websocket.Session;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
