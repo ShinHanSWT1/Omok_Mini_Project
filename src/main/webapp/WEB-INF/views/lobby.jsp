@@ -545,7 +545,7 @@
 
             // 버튼 클릭 이벤트
             joinBtn.onclick = function() {
-                location.href = '/omok/lobby/enter?roomId=' + room.roomId;
+                location.href = '/omok/lobby/enter?roomId=' + room.roomId + '&role=player';
             };
 
             // 관전 버튼
@@ -553,6 +553,10 @@
             spectateBtn.className = "btn-spectate";
             spectateBtn.innerText = "관전";
             // [수정] 사용하지 않는 주석 처리된 코드 삭제
+            spectateBtn.onclick = function() {
+                console.log('[lobby.jsp] spectateBtn= /omok/lobby/enter?roomId=' + room.roomId + '&role=spectator')
+                location.href = '/omok/lobby/enter?roomId=' + room.roomId + '&role=spectator';
+            };
 
             // 조립
             btnGroup.appendChild(joinBtn);

@@ -39,10 +39,13 @@ public class LobbyServlet extends HttpServlet {
             System.out.println("[INFO]lobby-doGet-enter");
             // 방 번호 가져오고
             String roomId = request.getParameter("roomId");
+            String role = request.getParameter("role");
             // 해당 방에 유저 입장
-            roomService.enterRoom(roomId, user);
+            if(role.equals("player")){
+                roomService.enterRoom(roomId, user);
+            }
             // 게임 방 화면으로 이동
-            response.sendRedirect("/omok/room?roomId=" + roomId);
+            response.sendRedirect("/omok/room?roomId=" + roomId + "&role=" + role);
             return;
         }
 
@@ -59,8 +62,10 @@ public class LobbyServlet extends HttpServlet {
             try {
                 // 해당 방에 유저 입장
                 roomService.enterRoom(room.getRoomId(), user);
+
                 // 게임 방 화면으로 이동
-                response.sendRedirect("/omok/room?roomId=" + room.getRoomId());
+                // 빠른 입장은 무조건 player로 시도
+                response.sendRedirect("/omok/room?roomId=" + room.getRoomId() + "&role=player");
             } catch (IllegalStateException e) {
                 // 방이 가득 찬 경우 (동시성 이슈 등)
                 System.out.println("[WARN] 빠른 입장 실패 - 방이 가득 참: " + e.getMessage());
@@ -76,6 +81,8 @@ public class LobbyServlet extends HttpServlet {
         // 기본: 로비 화면
         // 대기 중인 방 목록 가져옴
         List<Room> rooms = roomService.getWaitingRooms();
+//        List<Room> rooms = roomService.getAllRooms();
+
         // 랭킹 정보 조회
         List<RankingDTO> rankingList = RecordDAO.getTopRank();
         // JSP에서 쓸수 있도록 request에 저장
@@ -107,7 +114,7 @@ public class LobbyServlet extends HttpServlet {
             // 서비스 로직 호출 : 방장이 될 유저 ID로 새 방 생성
             Room room = roomService.createRoom(user.getUserId());
             // 생성된 방의 ID를 가지고 게임 방 화면으로 이동
-            response.sendRedirect("/omok/room?roomId=" + room.getRoomId());
+            response.sendRedirect("/omok/room?roomId=" + room.getRoomId() + "&role=player");
         }
 
     }

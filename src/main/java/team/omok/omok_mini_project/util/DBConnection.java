@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 
 public class DBConnection {
     private static final String URL =
-            "jdbc:postgresql://192.168.56.101:5432/omok";
+            "jdbc:postgresql://192.168.0.139:5432/omok";
     private static final String USER = "omokuser";
     private static final String PASSWORD = "omokpass";
 

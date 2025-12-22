@@ -19,8 +19,22 @@
     <script>
         const ROOM_ID = "<%= room.getRoomId() %>";
         const OWNER_ID = "<%= room.getOwnerId() %>";
-        const WS_URL = "ws://" + location.host + "<%=request.getContextPath()%>/ws/game/" + ROOM_ID;
+
+        // 관전 여부 (URL 파라미터 기준) true or false
+        const IS_SPECTATOR = <%= Boolean.TRUE.equals(request.getAttribute("isSpectator")) %>;
+
+        let WS_URL = "ws://" + location.host
+            + "<%=request.getContextPath()%>/ws/game/"
+            + ROOM_ID;
+
+        if (IS_SPECTATOR) {
+            WS_URL += "?role=spectator";
+        }else{
+            WS_URL += "?role=player"
+        }
+        console.log("[room.jsp]" + "IS_SPECTATOR=" + IS_SPECTATOR + " : WS_URL=" + WS_URL);
     </script>
+
 
     <!-- JS -->
     <script defer src="<%=request.getContextPath()%>/static/js/game.js"></script>

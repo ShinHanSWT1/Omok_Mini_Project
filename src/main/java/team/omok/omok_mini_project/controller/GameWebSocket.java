@@ -52,7 +52,8 @@ public class GameWebSocket {
 
         // 3) Join - RoomService에 위임
         try {
-            roomService.onJoin(roomId, userId, session, false);
+            boolean spectator = role == WsRole.SPECTATOR;
+            roomService.onJoin(roomId, userId, session, spectator);
         } catch (Exception e) {
             session.close();
         }
@@ -71,7 +72,8 @@ public class GameWebSocket {
             switch (wsMessage.getType()) {
                 case MOVE -> {
                     // 관전자 착수 불가
-                    if (isSpectator(session)) {
+                    WsRole role = (WsRole) session.getUserProperties().get(KEY_WS_ROLE);
+                    if (role == WsRole.SPECTATOR) {
                         sendError(session, "SPECTATOR_CANNOT_MOVE");
                         return;
                     }

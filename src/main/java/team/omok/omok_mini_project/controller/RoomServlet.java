@@ -22,12 +22,18 @@ public class RoomServlet extends HttpServlet {
         String roomId = request.getParameter("roomId");
         Room room = roomManager.getRoomById(roomId);
 
+        // 관전자인지 값 저장
+        boolean isSpectator = request.getParameter("role").equals("spectator");
+        System.out.println("[RoomServlet] " + request.getParameter("role") + ": " + request.getParameter("roomId"));
+        System.out.println("[RoomServlet] isSpectator=" + isSpectator);
         if (room == null) {
             response.sendRedirect("/omok/lobby");
             return;
         }
 
         request.setAttribute("room", room);
+        request.setAttribute("isSpectator", isSpectator);
+
         request.getRequestDispatcher("/WEB-INF/views/room.jsp")
                 .forward(request, response);
     }

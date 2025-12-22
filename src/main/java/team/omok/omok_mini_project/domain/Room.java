@@ -86,7 +86,7 @@ public class Room {
      * 기본값은 "플레이어로 시도" (players에 없으면 관전자로 들어감)
      */
     public synchronized void addSession(int userId, Session session) {
-        addSession(userId, session, false);
+        addSession(userId, session, true);
     }
 
     /**

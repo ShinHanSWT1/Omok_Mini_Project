@@ -11,7 +11,6 @@ import team.omok.omok_mini_project.manager.RoomManager;
 import team.omok.omok_mini_project.repository.RecordDAO;
 
 import javax.websocket.Session;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +37,7 @@ public class RoomService {
             throw new IllegalArgumentException("방이 존재하지 않습니다");
         } else if (room.isFull()) {
             throw new IllegalStateException("방이 꽉 찼습니다");
+            // TODO: 우회?
         }
         room.tryAddPlayer(user.getUserId());
 
@@ -74,97 +74,82 @@ public class RoomService {
     /// ////////////// 웹 소켓 통신 핸들러 ////////////////////
 
     // 소켓 onOpen
+    // 게임 시작할 때 서로의 프로필 사진, 닉네임 브로드캐스트
+    // TODO: GAME_START 일 때, myColor, firstTurn, userId 브로드캐스트
     public void onJoin(String roomId, int userId, Session session, boolean spectator) {
         Room room = getRoomOrThrow(roomId);
-
+        System.out.println("[onJoin] boolean spectator=" + spectator);
         JoinResult result = room.addSession(userId, session, spectator);
 
+        System.out.println("[onJoin] JoinResult=" + result);
         String nickname = null;
         String profileImg = null;
 
         switch (result) {
 
             case PLAYER_JOINED -> {
-
+                // 플레이어 정보 브로드캐스트
                 try {
                     UserVO userVO = userService.getUserById(userId);
-                    if (userVO != null) {
+                    System.out.println("[onJoin] UserVO=" + userVO);
+
+                    if (userVO == null) {
+                        nickname = "Guest_" + userId;
+                        profileImg = "/omok/static/img/profiles/p1.png";
+                    } else {
                         nickname = userVO.getNickname();
                         profileImg = userVO.getProfileImg();
-                    } else {
-                        nickname = "Guest_" + userId;
-                        profileImg = "/omok/static/img/profile/p1.png";
+                        if(profileImg == null) profileImg = "/omok/static/img/profiles/p1.png";
                     }
+                    broadcaster.broadcastAll(room,
+                            new WsMessage<>(
+                                    MessageType.JOIN,
+                                    Map.of(
+                                            // "userId", userVO.getUserId(),  // 굳이 전달해야하나?
+                                            "nickname", nickname,
+                                            "profileImg", profileImg,
+                                            "role", "PLAYER"
+                                    )
+                            )
+                    );
                 } catch (Exception e) {
-                    nickname = "Guest_" + userId;
-                    profileImg = "/omok/static/img/profile/p1.png";
                 }
-
-                broadcaster.broadcastAll(room,
-                        new WsMessage<>(
-                                MessageType.JOIN,
-                                Map.of(
-                                        "userId", userId,
-                                        "nickname", nickname,
-                                        "profileImg", "/omok/static/img/profiles/p5.png",
-                                        "role","PLAYER"
-                                )
-                        )
-                );
-
-                List<Map<String, Object>> members =
-                        room.getPlayers().stream()
-                                .map(pid -> {
-                                    UserVO u = null;
-                                    try {
-                                        u = userService.getUserById(pid);
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    Map<String, Object> map = new HashMap<>();
-                                    map.put("userId", pid);
-                                    map.put("nickname", u != null ? u.getNickname() : "Guest_" + pid);
-                                    map.put("profileImg", u != null ? u.getProfileImg()
-                                            : "/omok/static/img/profile/p1.png");
-
-                                    return map;
-                                })
-                                .toList();
-
-                broadcaster.broadcastToSession(session,
-                        new WsMessage<>(
-                                MessageType.ROOM_MEMBERS,
-                                members
-                        )
-                );
-
             }
 
+            // 관전자 입장
             case SPECTATOR_JOINED -> {
-                broadcaster.broadcastAll(room,
-                        new WsMessage<>(
-                                MessageType.JOIN,
-                                Map.of(
-                                        "userId", userId,
-                                        "role", "SPECTATOR"
-                                )
-                        )
-                );
+                // 관전자의 닉네임 전달
+                try {
+                    UserVO userVO = userService.getUserById(userId);
+                    System.out.println("[onJoin] UserVO=" + userVO);
+
+                    // TODO: 관전자가 비회원인 경우 -> 임시 사용
+                    if (userVO == null) {
+                        nickname = "Guest_" + userId;
+                    } else {
+                        nickname = userVO.getNickname();
+                    }
+                    broadcaster.broadcastAll(room,
+                            new WsMessage<>(
+                                    MessageType.JOIN,
+                                    Map.of(
+                                            "nickname", nickname,
+                                            "role", "SPECTATOR"
+                                    )
+                            )
+                    );
+                } catch (Exception e) { }
             }
 
             case ROOM_READY -> {
                 broadcaster.broadcastAll(room,
                         new WsMessage<>(
-                                MessageType.ROOM_READY,
-                                Map.of()
+                                MessageType.ROOM_READY, "게임이 곧 시작됩니다!"
                         )
                 );
 
                 room.tryStartGame();
 
-                // (선택) 카운트다운 시작 안내
-                // 실제 카운트다운은 Room 내부에서 status 전이로 자동 시작됨
             }
         }
     }
