@@ -1,13 +1,13 @@
 package team.omok.omok_mini_project.domain;
 
+import team.omok.omok_mini_project.enums.GameStatus;
+import team.omok.omok_mini_project.enums.Stone;
+
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import team.omok.omok_mini_project.enums.GameStatus;
-import team.omok.omok_mini_project.enums.Stone;
 
 /*
  * 게임 상태 저장소(서버 authoritative).
@@ -22,7 +22,7 @@ import team.omok.omok_mini_project.enums.Stone;
 public class GameState {
     public static final int SIZE = 15;
     private static final int NONE = -1;
-    
+
     // 턴 제한 시간
     private static final long TURN_LIMIT_MS = 30_000L;
 
@@ -36,6 +36,22 @@ public class GameState {
 
     // MoveResult 쪽에서 TIMEOUT reason으로 바꿔치기 위해 쓰는 ThreadLocal
     private static final ThreadLocal<String> REASON_OVERRIDE = new ThreadLocal<>();
+    private final Stone[][] board = new Stone[SIZE][SIZE];
+    private Stone turn;
+    private GameStatus status;
+    // 유저 매핑 (DB Users.user_id)
+    private int blackUserId;
+    private int whiteUserId;
+    // 승자 (Users.user_id), 없으면 -1
+    private int winnerId;
+    // 타이머 상태
+    private long turnDeadlineMs;          // 현재 턴 마감 시각(epoch ms)
+    private int turnSeq;                  // 스케줄 레이스 방지용 시퀀스
+    private ScheduledFuture<?> timeoutFuture;
+    private String endReason;
+    public GameState() {
+        reset();
+    }
 
     static void setReasonOverride(String reason) {
         REASON_OVERRIDE.set(reason);
@@ -47,27 +63,14 @@ public class GameState {
         return v;
     }
 
-    private final Stone[][] board = new Stone[SIZE][SIZE];
+    public static Stone opposite(Stone s) {
+        if (s == Stone.BLACK) return Stone.WHITE;
+        if (s == Stone.WHITE) return Stone.BLACK;
+        return Stone.EMPTY;
+    }
 
-    private Stone turn;
-    private GameStatus status;
-
-    // 유저 매핑 (DB Users.user_id)
-    private int blackUserId;
-    private int whiteUserId;
-
-    // 승자 (Users.user_id), 없으면 -1
-    private int winnerId;
-    
-    // 타이머 상태
-    private long turnDeadlineMs;          // 현재 턴 마감 시각(epoch ms)
-    private int turnSeq;                  // 스케줄 레이스 방지용 시퀀스
-    private ScheduledFuture<?> timeoutFuture;
-
-    private String endReason;
-
-    public GameState() {
-        reset();
+    public static boolean isPlayerStone(Stone s) {
+        return s == Stone.BLACK || s == Stone.WHITE;
     }
 
     public void reset() {
@@ -80,22 +83,12 @@ public class GameState {
         this.blackUserId = NONE;
         this.whiteUserId = NONE;
         this.winnerId = NONE;
-        
+
         this.turnDeadlineMs = 0L;
         this.turnSeq = 0;
         this.endReason = null;
 
         cancelTimeoutLocked();
-    }
-
-    public static Stone opposite(Stone s) {
-        if (s == Stone.BLACK) return Stone.WHITE;
-        if (s == Stone.WHITE) return Stone.BLACK;
-        return Stone.EMPTY;
-    }
-
-    public static boolean isPlayerStone(Stone s) {
-        return s == Stone.BLACK || s == Stone.WHITE;
     }
 
     public boolean inBounds(int x, int y) {
@@ -124,7 +117,7 @@ public class GameState {
         }
         this.turn = turn;
     }
-    
+
     /**
      * 정상 착수 후 OmokRule이 호출함
      * -> 여기서 턴을 바꾸면서 다음 턴 30초를 "자동"으로 리셋한다.
@@ -179,7 +172,7 @@ public class GameState {
         this.winnerId = winnerId;
         cancelTimeoutLocked();
     }
-    
+
     public synchronized int getBlackUserId() {
         return blackUserId;
     }
@@ -245,12 +238,26 @@ public class GameState {
             this.timeoutFuture = null;
         }
     }
-    
+
     public synchronized long getTurnDeadlineMs() {
         return turnDeadlineMs;
     }
 
     public synchronized String getEndReason() {
         return endReason;
+    }
+
+    // 보드판 상태 전달(관전자 용)
+    public synchronized Stone[][] getBoard() {
+        Stone[][] copy = new Stone[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            copy[i] = board[i].clone();
+        }
+        return copy;
+    }
+
+    public synchronized long getRemainingTimeMs() {
+        if (status != GameStatus.IN_PROGRESS) return 0;
+        return Math.max(0, turnDeadlineMs - System.currentTimeMillis());
     }
 }

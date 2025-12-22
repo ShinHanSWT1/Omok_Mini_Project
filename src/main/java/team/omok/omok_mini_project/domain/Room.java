@@ -29,24 +29,18 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Data
 public class Room {
-    UserService userService = new UserService();
-
     private static final int MAX_PLAYER = 2;
-
     private final String roomId;
     private final int ownerId;
     private final long createdAt;                   // 방 생성 시간
     private final RecordDAO recordDAO = new RecordDAO();
-
     // 플레이어(user_id 저장 -> HTTP로 /enter 통해 들어오는 플레이어 아이디 저장 필요)
     private final List<Integer> players = new ArrayList<>(MAX_PLAYER);
-
     // 플레이어 세션 (userId -> session)
     private final Map<Integer, Session> playerSessionMap = new ConcurrentHashMap<>();
-
     // 관전자 세션
     private final Set<Session> spectatorSessions = ConcurrentHashMap.newKeySet();
-
+    UserService userService = new UserService();
     // 방 상태: WAITING, READY, COUNTDOWN, PLAYING, END
     private RoomStatus status = RoomStatus.WAIT;
 
@@ -246,7 +240,6 @@ public class Room {
             String myStone =
                     (userId == game.state.getBlackUserId()) ? "BLACK" : "WHITE";
 
-            // TODO: 각 유저의 프로필 사진 전달
             broadcaster.broadcastToSession(s, new WsMessage<>(
                     MessageType.GAME_START,
                     Map.of(
@@ -260,11 +253,21 @@ public class Room {
             ));
             System.out.println(userId + ": " + myStone);
         }
+
+        // (추가)관전자들에게 전송 (돌 색상 정보 없음)
+        WsMessage<Map<String, Object>> spectatorMsg = new WsMessage<>(
+                MessageType.GAME_START,
+                Map.of(
+                        "blackPlayerId", game.state.getBlackUserId(),
+                        "whitePlayerId", game.state.getWhiteUserId(),
+                        "firstTurn", "BLACK"
+                )
+        );
+        broadcaster.broadcastToSpectators(this, spectatorMsg);
     }
 
     // 게임 종료 함수
     public synchronized void endGame() {
-        // TODO: 게임 결과 저장 및 유저 전적 업데이트
         // 게임 상태에서 승자 ID 가져오기
         int winnerId = this.game.state.getWinnerId();
 
@@ -303,6 +306,14 @@ public class Room {
     // 게임 시작 가능 조건
     private boolean isReady() {
         return this.players.size() == MAX_PLAYER && this.playerSessionMap.size() == MAX_PLAYER;
+    }
+
+    public boolean isPlayer(int userId) {
+        return playerSessionMap.containsKey(userId);
+    }
+
+    public int getPlayerIndex(int userId) {
+        return ownerId == userId ? 1 : 2;
     }
 
 }

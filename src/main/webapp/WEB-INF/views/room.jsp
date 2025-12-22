@@ -29,7 +29,7 @@
 
         if (IS_SPECTATOR) {
             WS_URL += "?role=spectator";
-        }else{
+        } else {
             WS_URL += "?role=player"
         }
         console.log("[room.jsp]" + "IS_SPECTATOR=" + IS_SPECTATOR + " : WS_URL=" + WS_URL);
@@ -45,17 +45,19 @@
 
 <body>
 
+<div id="status"></div>
+<div id="countdown"></div>
 <div class="room-container">
     <!-- 왼쪽 : 게임 -->
     <section class="game-section">
-
-
         <!-- 게임 보드 영역 -->
         <div class="board-area">
             <div class="player player-left">
                 <div class="profile-frame">
-                    <img class="profile-img" src="<%=request.getContextPath()%><%=loginUser.getProfileImg()%>">
+                    <img class="profile-img" src="">
                 </div>
+                <div class="player-nickname"></div>
+
                 <div class="speech-bubble" id="bubble-p1">
                     <span class="bubble-text"></span>
                 </div>
@@ -73,11 +75,12 @@
                 <!-- 타이머 바   -->
                 <div class="timerbar"></div>
             </div>
-
             <div class="player player-right">
                 <div class="profile-frame">
-                    <img class="profile-img" src="<%=request.getContextPath()%><%=loginUser.getProfileImg()%>">
+                    <img class="profile-img" src="">
                 </div>
+                <div class="player-nickname"></div>
+
                 <div class="speech-bubble" id="bubble-p2">
                     <span class="bubble-text"></span>
                 </div>

@@ -13,5 +13,6 @@ public enum MessageType {
     GAME_END,
     CHAT,
     ERROR,
-    ROOM_MEMBERS
+    BOARD_SNAPSHOT,
+    ROOM_MEMBERS,
 }

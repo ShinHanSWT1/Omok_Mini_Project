@@ -6,6 +6,7 @@ const playerRightEl = document.querySelector(".player-right");
 let gridLayer = null;
 let myColor = null;
 let myUserId = null;
+let isSpectator = false;
 // console.log("game_ui.js loaded", boardEl);
 
 const messageHandlers = {
@@ -18,7 +19,8 @@ const messageHandlers = {
     GAME_END: handleGameEnd,
     CHAT: handleChat,
     ERROR: handleError,
-    ROOM_MEMBERS: handleRoomMembers
+    ROOM_MEMBERS: handleRoomMembers,
+    BOARD_SNAPSHOT: handleBoardSnapshot,
 };
 
 function handleServerMessage(msg) {
@@ -31,14 +33,31 @@ function handleServerMessage(msg) {
 }
 
 function handleJoin(payload) {
-    // 아이디, 프로필 사진, 닉네임
     console.log("JOIN:", payload);
-    myUserId = payload.userId;
+    isSpectator = payload.role === "SPECTATOR";
+
+    // UI 업데이트 (기존 로직)
     updatePlayerUI(payload);
+
+    // 채팅창에 입장 알림 출력
+    // 내가 들어왔을 때 기존 멤버 리스트를 받는 경우(ROOM_MEMBERS)가 아니라면 출력
+    if (payload.nickname) {
+        appendSystemMessage(`[알림] ${payload.nickname}님이 입장하셨습니다.`);
+    }
 }
 
 function handleLeave(payload) {
     console.log("LEAVE:", payload);
+
+    // 채팅창에 퇴장 알림 출력
+    if (payload.nickname) {
+        appendSystemMessage(`[알림] ${payload.nickname}님이 퇴장하셨습니다.`);
+    }
+
+    // 플레이어가 나갔을 때 UI 초기화 (기본 이미지로 변경 등) 필요 시 추가
+    if (payload.reason === "PLAYER_LEFT" || payload.reason === "PLAYER_GG") {
+        resetPlayerUI(payload.userId);
+    }
 }
 
 function handleCountdown(payload) {
@@ -48,9 +67,9 @@ function handleCountdown(payload) {
 function handleGameStart(payload) {
     if (payload.myColor) {
         myColor = payload.myColor;
-        console.log("내 색:", myColor);
     }
-    if(payload.myUserId){
+
+    if (payload.myUserId) {
         myUserId = payload.myUserId;
     }
 
@@ -69,11 +88,14 @@ function handleRoomWait(payload) {
 function handleGameEnd(payload) {
     console.log(myUserId);
     // 타임아웃으로 인한 게임 종료 처리
-    if(payload.reason === "TIMEOUT"){
-        if (payload.winner === myUserId) {
-            alert("상대가 시간 초과로 패배했습니다!");
-        } else {
-            alert("시간 초과로 패배했습니다.");
+    if (payload.reason === "TIMEOUT") {
+        // 플레이어
+        if (payload.winner) {
+            if (payload.winner === myUserId) {
+                alert("상대가 시간 초과로 패배했습니다!");
+            } else {
+                alert("시간 초과로 패배했습니다.");
+            }
         }
         return;
     }
@@ -82,9 +104,9 @@ function handleGameEnd(payload) {
         alert("🎉 게임 종료! 승리하셨습니다!");
     } else if (payload.winner !== myUserId) {
         alert("게임에서 패배했습니다 :(")
-    } else if(payload.winner){
+    } else if (payload.winner) {
         alert("게임 종료: " + payload.reason);
-    }else{
+    } else {
         alert("게임이 종료되었습니다.");
     }
 
@@ -95,7 +117,7 @@ function handleGameEnd(payload) {
 }
 
 function handleChat(payload) {
-    const { senderRole, playerIndex, message } = payload;
+    const {senderRole, playerIndex, message} = payload;
 
     if (senderRole === "PLAYER") {
         showPlayerBubble(playerIndex, message);
@@ -104,10 +126,31 @@ function handleChat(payload) {
     }
 }
 
+function handleBoardSnapshot(payload) {
+    const {board, turn, remainingTime} = payload;
+
+    // 1. 보드 초기화 및 렌더링
+    renderBoard();
+
+    // 2. 2차원 배열을 돌며 돌 그리기
+    for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+            const stone = board[y][x];
+            if (stone === "BLACK" || stone === "WHITE") {
+                drawStone(x, y, stone);
+            }
+        }
+    }
+
+    // 3. 현재 턴 표시 및 남은 시간 UI 연동 (필요 시)
+    updateActivePlayer(turn);
+    console.log(`현재 ${turn}의 턴, 남은 시간: ${remainingTime}ms`);
+}
+
 
 function showCountdown(sec) {
-    // statusEl.innerText = "게임 준비 중...";
-    // countdownEl.innerText = `시작까지 ${sec}초`;
+    statusEl.innerText = "게임 준비 중...";
+    countdownEl.innerText = `시작까지 ${sec}초`;
 }
 
 function renderBoard() {
@@ -157,7 +200,6 @@ function showPlayerBubble(playerIndex, message) {
 }
 
 
-
 function appendSpectatorChat(message) {
     const chatLog = document.getElementById("chatLog");
     if (!chatLog) return;
@@ -171,7 +213,7 @@ function appendSpectatorChat(message) {
 }
 
 function handleError(payload) {
-    const { code, message } = payload;
+    const {code, message} = payload;
     console.warn("ERROR:", code, message);
 
     // 지금은 간단히 알림
@@ -194,16 +236,63 @@ function handleRoomMembers(payload) {
     payload.forEach(user => updatePlayerUI(user));
 }
 
-function updatePlayerUI(user) {
-    const isOwner = String(user.userId) === String(OWNER_ID);
+function updatePlayerUI(payload) {
+    // 관전자는 UI 상단 프로필 자리에 그리지 않음
+    if (payload.role === "SPECTATOR") {
+        console.log("관전자 입장: " + payload.nickname);
+        appendSpectatorChat(payload.nickname + "님이 관전 중입니다.");
+        return;
+    }
+
+    // 방장(OWNER_ID)이면 왼쪽, 아니면 오른쪽 배치
+    const isOwner = String(payload.userId) === String(OWNER_ID);
+    const targetEl = isOwner ? playerLeftEl : playerRightEl;
+
+    if (!targetEl) return;
+
+    // 프로필 이미지 업데이트
+    const imgEl = targetEl.querySelector(".profile-img");
+    if (imgEl && payload.profileImg) {
+        imgEl.src = payload.profileImg;
+    }
+
+    // 닉네임 업데이트
+    const nameEl = targetEl.querySelector(".player-nickname");
+    if (nameEl && payload.nickname) {
+        nameEl.innerText = payload.nickname;
+    }
+}
+
+// 시스템 메시지 출력용 함수 추가
+function appendSystemMessage(msg) {
+    const chatLog = document.getElementById("chatLog");
+    if (!chatLog) return;
+
+    const div = document.createElement("div");
+    div.className = "system-message"; // CSS 스타일링을 위해 클래스 추가
+    div.innerText = msg;
+
+    // 스타일 직접 지정 (TODO: CSS 파일로 빼기)
+    div.style.color = "#888";
+    div.style.fontSize = "0.9em";
+    div.style.textAlign = "center";
+    div.style.margin = "5px 0";
+
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+// 플레이어 나갔을 때 프사 내리는 함수
+function resetPlayerUI(leftUserId) {
+    // 나간 사람이 방장(왼쪽)이었는지 확인
+    const isOwner = String(leftUserId) === String(OWNER_ID);
     const targetEl = isOwner ? playerLeftEl : playerRightEl;
 
     if (targetEl) {
         const imgEl = targetEl.querySelector(".profile-img");
-        if (imgEl) {
-            // 경로가 상위 폴더를 가리키고 있다면 contextPath 처리가 필요할 수 있음
-            imgEl.src = user.profileImg;
-        }
-        // 닉네임 표시를 위한 엘리먼트가 있다면 여기서 업데이트 (예: targetEl.querySelector(".name").innerText = user.nickname)
+        if (imgEl) imgEl.src = ""; // 혹은 기본 이미지
+
+        const nameEl = targetEl.querySelector(".player-nickname");
+        if (nameEl) nameEl.innerText = "Waiting...";
     }
 }
