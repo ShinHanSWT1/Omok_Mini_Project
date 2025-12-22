@@ -26,7 +26,7 @@ public class RecordDAO {
                 dto.setRank(currentRank++);
                 dto.setNickname(rs.getString("nickname"));
                 dto.setRating(rs.getInt("rating"));
-                dto.setProfileImg(rs.getString("profileImg"));
+                dto.setProfileImg(rs.getString("profile_img"));
                 list.add(dto);
             }
         } catch (Exception e) {
