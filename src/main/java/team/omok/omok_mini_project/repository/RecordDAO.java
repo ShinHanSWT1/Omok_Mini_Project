@@ -13,7 +13,7 @@ public class RecordDAO {
     public static List<RankingDTO> getTopRank() {
         List<RankingDTO> list = new ArrayList<RankingDTO>();
 
-        String sql = "SELECT u.nickname, r.rating " +
+        String sql = "SELECT u.nickname, r.rating, u.profile_img " +
                 "FROM record r JOIN users u " +
                 "ON r.user_id = u.user_id " +
                 "ORDER BY r.rating DESC LIMIT 10";
@@ -26,6 +26,7 @@ public class RecordDAO {
                 dto.setRank(currentRank++);
                 dto.setNickname(rs.getString("nickname"));
                 dto.setRating(rs.getInt("rating"));
+                dto.setProfileImg(rs.getString("profile_img"));
                 list.add(dto);
             }
         } catch (Exception e) {
@@ -42,7 +43,6 @@ public class RecordDAO {
         } else {
             sql = "UPDATE record SET rating = GREATEST(0, rating - 10), lose_count = lose_count + 1, updated_at = NOW() WHERE user_id = ?";
         }
-
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 

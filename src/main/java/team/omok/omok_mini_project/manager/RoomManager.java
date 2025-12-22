@@ -1,5 +1,6 @@
 package team.omok.omok_mini_project.manager;
 
+import team.omok.omok_mini_project.controller.LobbyWebSocket;
 import team.omok.omok_mini_project.domain.Room;
 
 import javax.websocket.Session;
@@ -17,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * 오직 생성/조회/삭제/목록 반환
  *
  * @see Room
- *
  */
 
 public class RoomManager {
@@ -35,14 +35,7 @@ public class RoomManager {
         rooms.put(roomId, room);
         System.out.println("[INFO]RoomManager - createRoom:" + roomId);
 
-        // 로비 웹소켓 test용
-        // TODO: LobbyWebSocket으로 바꾸기
-        LobbyManager.getInstance().broadcastRoomList();
-
-        // TODO:
-        // 현재는 단순화를 위해 RoomManager에서 직접 LobbyWebSocket을 호출한다.
-        // 추후 이벤트 기반 구조로 변경 시 제거 대상.
-        //LobbyWebSocket.broadcastRoomList();
+        LobbyWebSocket.broadcastRoomList();
 
         return room;
     }
@@ -60,8 +53,7 @@ public class RoomManager {
 
         // 로비에 방 목록 업데이트 전송 (실시간으로 방이 사라짐)
         if (removed) {
-            // TODO: LobbyWebSocket으로 바꾸기
-            LobbyManager.getInstance().broadcastRoomList();
+            LobbyWebSocket.broadcastRoomList();
         }
 
         return removed;

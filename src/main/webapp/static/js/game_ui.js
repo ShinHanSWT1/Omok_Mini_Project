@@ -115,11 +115,19 @@ function handleGameEnd(payload) {
         if (payload.winner) {
             if (payload.winner === myUserId) {
                 alert("상대가 시간 초과로 패배했습니다!");
-            } else {
+            } else if (payload !== myUserId){
                 alert("시간 초과로 패배했습니다.");
+            } else{
+                alert("게임이 종료되었습니다!");
             }
         }
-    }else if (payload.winner === myUserId) {
+
+        setTimeout(() => {
+            location.href = "/omok/lobby";
+        }, 300);
+    }
+
+    if (payload.winner === myUserId) {
         alert("🎉 게임 종료! 승리하셨습니다!");
     } else if (payload.winner !== myUserId) {
         alert("게임에서 패배했습니다 :(")
@@ -352,5 +360,5 @@ function startTurnTimer() {
 }
 function stopTurnTimer() {
     clearInterval(timerInterval);
-    timerFill.style.width = "0%";
+    // timerFill.style.width = "0%";
 }

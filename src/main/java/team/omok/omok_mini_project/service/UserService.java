@@ -5,7 +5,7 @@ import team.omok.omok_mini_project.repository.UserDAO;
 
 public class UserService {
 
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     public UserVO getUserById(int userId) throws Exception {
 
@@ -35,7 +35,10 @@ public class UserService {
 //        );
 
         userDAO.insert(user); //db저장 메서드 호출
+
+        // TODO: user 새로 만들때 record도 같이 insert 해줘야함
     }
+
     public UserVO login(String loginId, String password) throws Exception {
         if (loginId == null || loginId.isBlank())
             throw new IllegalArgumentException("아이디 입력하세요");

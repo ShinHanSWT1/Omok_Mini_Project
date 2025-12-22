@@ -91,7 +91,7 @@ public class UserDAO {
                 r.setLose_count(rs.getInt("lose_count"));
                 r.setUpdated_at(rs.getTimestamp("updated_at"));
 
-                // UserVO 객체에 RecordVO 주입
+                // UserVO에 RecordVO 추가
                 u.setRecord(r);
                 return u;
             }

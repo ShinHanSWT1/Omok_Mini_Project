@@ -66,6 +66,7 @@
             overflow-y: auto;
             padding-right: 5px;
             min-height: 0;
+            background-color: rgba(255, 255, 255, 0.4)
         }
         .rank-item {
             width: 98%;
@@ -77,13 +78,14 @@
             display: flex; align-items: center;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.2s;
+            background-color: rgba(255, 255, 255, 0.4)
         }
         .rank-item:hover { transform: scale(1.02); background-color: #fff9c4; }
         .rank-badge {
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background-color: #ddd;
+            background-color: #ffffff;
             color: black;
             text-align: center;
             line-height: 28px;
@@ -109,7 +111,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.4);
             border: 2px solid #333;
             border-radius: 10px;
             padding: 10px;
@@ -118,11 +120,12 @@
             flex-grow: 1;
             overflow-y: auto;
             border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            background-color: rgba(255, 255, 255, 0.3);
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
             font-size: 14px;
+
         }
         .chat-message { margin-bottom: 5px; }
         .chat-nickname { font-weight: bold; color: #d32f2f; margin-right: 5px; }
@@ -133,6 +136,7 @@
             padding: 8px;
             border: 2px solid #ccc;
             border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.3);
         }
         .chat-input-area button {
             background-color: transparent;
@@ -155,7 +159,7 @@
             display: flex;
             flex-direction: column;
             border: 2px inset #ddd;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.3);
             border-radius: 10px;
             padding: 10px;
             overflow: hidden;
@@ -171,7 +175,7 @@
             gap: 5px;
             margin-top: auto;
             margin-bottom: 5px;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.3);
             padding: 5px;
             border-radius: 5px;
             border: 1px solid #ddd;
@@ -181,6 +185,7 @@
             padding: 8px;
             border: 2px solid #ccc;
             border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.3);
         }
         .room-code-area button {
             background-color: transparent;
@@ -261,24 +266,57 @@
         }
 
         /* 유저 프로필 */
-        .user-profile {
-            position: absolute;
-            top: 32px;
-            right: 20px;
-
-            width: 49%;
+        .user-profile-btn {
+            position: relative;
             height: 45px;
-
+            width: auto;
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
-
-            background-color: transparent;
-            border: none;
-            padding: 0;
             cursor: pointer;
-            z-index: 100;
         }
+        .user-header-area {
+            position: absolute;
+            top: 20px;
+            height: 45px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+        }
+        .user-profile-photo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #3eb5f0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            background-color: white;
+            object-fit: cover;
+        }
+        .user-profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 닉네임 텍스트 스타일 */
+        .user-nickname {
+            position: absolute; /* 배경위에 nickname 표시 */
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+            z-index: 1100;
+            transition: transform 0.2s;
+        }
+
+        .user-profile:hover .user-nickname {
+            transform: scale(1.05);
+            color: #ffd700;
+        }
+
         .user-profile img {
             height: 100%;
             width: auto;
@@ -300,7 +338,7 @@
             font-size: 14px;
             text-align: center;
         }
-        /* --- 프로필 메뉴 내부 상세 디자인 추가 --- */
+        /* 프로필 메뉴 내부 상세 디자인 추가  */
         .menu-header {
             font-size: 16px;
             font-weight: bold;
@@ -355,9 +393,15 @@
 <body>
 
 <div class="wrap">
+    <div class="user-header-area">
+        <img src="${pageContext.request.contextPath}${loginUser.profileImg}"
+             class="user-profile-photo"
+             onerror="this.src='${pageContext.request.contextPath}/static/img/profiles/p1.png'">
 
-    <div class="user-profile" onclick="toggleMenu()">
-        <img src="${pageContext.request.contextPath}/static/img/UserBtn.png" alt="User">
+        <div class="user-profile-btn" onclick="toggleMenu()">
+            <span class="user-nickname">${loginUser.nickname} 님</span>
+            <img src="${pageContext.request.contextPath}/static/img/UserBtn.png" alt="User" class="user-profile-btn">
+        </div>
     </div>
     <div id="myMenu" class="profile-menu">
         <c:choose>
@@ -417,7 +461,9 @@
             <c:forEach var="ranker" items="${rankingList}">
                 <div class="rank-item">
                     <div class="rank-badge">${ranker.rank}</div>
-                    <img src="/omok/image/default_profile.png" class="rank-profile-img">
+                    <img src="${pageContext.request.contextPath}${ranker.profileImg}"
+                         class="rank-profile-img"
+                         onerror="this.src='${pageContext.request.contextPath}/static/img/profiles/p1.png'">
                     <div class="rank-info">
                         <span class="rank-nickname">${ranker.nickname}</span>
                         <span class="rank-score">Rating: ${ranker.rating}</span>

@@ -1,5 +1,6 @@
 package team.omok.omok_mini_project.service;
 
+import team.omok.omok_mini_project.controller.LobbyWebSocket;
 import team.omok.omok_mini_project.domain.GameState;
 import team.omok.omok_mini_project.domain.MoveResult;
 import team.omok.omok_mini_project.domain.Room;
@@ -42,10 +43,7 @@ public class RoomService {
             // TODO: 우회?
         }
         room.tryAddPlayer(user.getUserId());
-
-        // TODO: LobbyWebSocket에서 방 목록 실시간 갱신을 위한 broadcast 추가
-        // 현재는 단순화를 위해 RoomManager에서 직접 LobbyWebSocket을 호출한다
-        // 추후 이벤트 기반 구조로 변경 시 제거 대상이 된다
+        LobbyWebSocket.broadcastRoomList();
     }
 
     // 관전자로 방 입장
@@ -280,24 +278,9 @@ public class RoomService {
     private void handleGameEnd(Room room) {
         room.endGame();
 
-        // DB 저장
-        // 게임 상태에서 승자 ID 가져오기
-        int winnerId = room.getGame().getState().getWinnerId();
+        LobbyWebSocket.broadcastRanking();
 
-        // 승자가 있을 경우 (무승부가 아님) DB 업데이트
-        if (winnerId != -1) {
-            for (Integer playerId : room.getPlayers()) {
-                boolean isWin = (playerId == winnerId);
-                // DAO 호출: 이긴 사람은 true, 진 사람은 false 전달
-                recordDAO.updateRating(playerId, isWin);
-            }
-        }
-
-        // TODO: 방 제거 여부 판단
-        // 방 제거 정책. 필요하면 cleanUp() 호출 정책 결정
-        // cleanUp();
         roomManager.removeRoom(room.getRoomId());
-
     }
 
 

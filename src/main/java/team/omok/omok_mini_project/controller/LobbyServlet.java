@@ -1,25 +1,26 @@
 package team.omok.omok_mini_project.controller;
 
-import team.omok.omok_mini_project.domain.dto.RankingDTO;
 import team.omok.omok_mini_project.domain.Room;
+import team.omok.omok_mini_project.domain.dto.RankingDTO;
 import team.omok.omok_mini_project.domain.vo.UserVO;
 import team.omok.omok_mini_project.repository.RecordDAO;
 import team.omok.omok_mini_project.service.RoomService;
+import team.omok.omok_mini_project.service.UserService;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
-
 
 
 @WebServlet("/lobby/*")
 // 방 목록 조회,방 생성, 방입장(방 관련 비즈니스 로직)
 public class LobbyServlet extends HttpServlet {
     private final RoomService roomService = new RoomService();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,6 +34,24 @@ public class LobbyServlet extends HttpServlet {
             return;
         }
 
+        // ★ 중요: 세션의 유저 정보를 DB에서 최신 정보로 갱신
+        // 이유: 게임이 끝나면 DB의 record 테이블(승/패/레이팅)은 업데이트되지만,
+        //       세션에 저장된 loginUser 객체는 옛날 데이터 그대로임
+        // 결과: lobby.jsp에서 ${loginUser.record.win_count} 등이 게임 전 데이터로 표시됨
+        // 해결: 로비 접속할 때마다 DB에서 최신 정보를 조회해서 세션을 갱신
+        try {
+            UserVO updatedUser = userService.getUserById(user.getUserId());
+            if (updatedUser != null) {
+                // 세션에 최신 유저 정보로 덮어쓰기
+                request.getSession().setAttribute("loginUser", updatedUser);
+                user = updatedUser; // 이후 로직에서 사용할 변수도 갱신
+            }
+        } catch (Exception e) {
+            System.err.println("[LobbyServlet] 유저 정보 갱신 실패: " + e.getMessage());
+            e.printStackTrace();
+            // 갱신 실패해도 기존 세션 정보로 계속 진행 (에러로 중단하지 않음)
+        }
+
         // 경로 확인 -> enter체크 -> 로그인 정보 가져와
         String path = request.getPathInfo(); // null, /enter, /quick-enter
         if ("/enter".equals(path)) {
@@ -41,7 +60,7 @@ public class LobbyServlet extends HttpServlet {
             String roomId = request.getParameter("roomId");
             String role = request.getParameter("role");
             // 해당 방에 유저 입장
-            if(role.equals("player")){
+            if (role.equals("player")) {
                 roomService.enterRoom(roomId, user);
             }
             // 게임 방 화면으로 이동
