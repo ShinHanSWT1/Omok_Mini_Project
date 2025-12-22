@@ -18,7 +18,9 @@
 
     if (loginId == null) loginId = "";
     if (nickname == null) nickname = "";
-    if (profileImg == null || profileImg.isBlank()) profileImg = "/assets/profiles/p1.png";
+
+
+    if (profileImg == null || profileImg.isBlank()) profileImg = "/static/img/profiles/p1.png";
 %>
 
 <div class="screen">
@@ -51,19 +53,24 @@
                 <label>프로필 선택</label>
 
                 <div class="profiles" id="profiles">
-                    <img class="profile-item" src="${pageContext.request.contextPath}/static/img/profiles/p1.png"
-                         data-value="/assets/profiles/p1.png" alt="p1">
-                    <img class="profile-item" src="${pageContext.request.contextPath}/static/img/profiles/p2.png"
-                         data-value="/assets/profiles/p2.png" alt="p2">
-                    <img class="profile-item" src="${pageContext.request.contextPath}/static/img/profiles/p3.png"
-                         data-value="/assets/profiles/p3.png" alt="p3">
-                    <img class="profile-item" src="${pageContext.request.contextPath}/static/img/profiles/p4.png"
-                         data-value="/assets/profiles/p4.png" alt="p4">
-                    <img class="profile-item" src="${pageContext.request.contextPath}/static/img/profiles/p5.png"
-                         data-value="/assets/profiles/p5.png" alt="p5">
+                    <img class="profile-item"
+                         src="${pageContext.request.contextPath}/static/img/profiles/p1.png"
+                         data-value="/static/img/profiles/p1.png" alt="p1">
+                    <img class="profile-item"
+                         src="${pageContext.request.contextPath}/static/img/profiles/p2.png"
+                         data-value="/static/img/profiles/p2.png" alt="p2">
+                    <img class="profile-item"
+                         src="${pageContext.request.contextPath}/static/img/profiles/p3.png"
+                         data-value="/static/img/profiles/p3.png" alt="p3">
+                    <img class="profile-item"
+                         src="${pageContext.request.contextPath}/static/img/profiles/p4.png"
+                         data-value="/static/img/profiles/p4.png" alt="p4">
+                    <img class="profile-item"
+                         src="${pageContext.request.contextPath}/static/img/profiles/p5.png"
+                         data-value="/static/img/profiles/p5.png" alt="p5">
                 </div>
 
-                <!-- 서버로 넘어갈 값 -->
+
                 <input type="hidden" name="profileImg" id="profileImg" value="<%= profileImg %>">
 
                 <div class="hint">원하는 프로필 이미지를 클릭하세요.</div>

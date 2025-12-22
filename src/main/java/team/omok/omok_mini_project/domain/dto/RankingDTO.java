@@ -7,4 +7,5 @@ public class RankingDTO {
     private int rank;
     private String nickname;
     private int rating;
+    private String profileImg;
 }

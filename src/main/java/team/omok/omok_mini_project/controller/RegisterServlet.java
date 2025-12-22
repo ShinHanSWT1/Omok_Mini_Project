@@ -21,11 +21,10 @@ public class RegisterServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) //get요청 받으면 회원가입화면표시)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
     }
-
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -36,16 +35,19 @@ public class RegisterServlet extends HttpServlet {
         String loginId = req.getParameter("loginId");
         String password = req.getParameter("password");
         String nickname = req.getParameter("nickname");
-        String profileImg = req.getParameter("profileImg"); //이미지 일단 문자열로 함 추후 수정예정
-        //기본값
+        String profileImg = req.getParameter("profileImg"); // JSP hidden input 값
+
+        // 이미지 입력안할시 1번 이미지로
         if (profileImg == null || profileImg.isBlank()) {
-            profileImg = "/assets/profiles/p1.png";
-        }
-        // 허용된 경로만 저장
-        if (!profileImg.startsWith("/assets/profiles/")) {
-            profileImg = "/assets/profiles/p1.png";
+            profileImg = "/static/img/profiles/p1.png";
         }
 
+        //  허용된 경로만 저장 (보안/검증)
+        // - /omok 같은 contextPath는 DB에 저장하지 않는 게 좋음
+        // - 항상 "/static/..."로 통일
+        if (!profileImg.startsWith("/static/img/profiles/")) {
+            profileImg = "/static/img/profiles/p1.png";
+        }
 
         UserVO user = new UserVO();
         user.setLoginId(loginId);
@@ -57,7 +59,6 @@ public class RegisterServlet extends HttpServlet {
             userService.register(user);
             resp.sendRedirect(req.getContextPath() + "/login");
         } catch (Exception e) {
-
             req.setAttribute("error", e.getMessage());
             req.setAttribute("loginId", loginId);
             req.setAttribute("nickname", nickname);
